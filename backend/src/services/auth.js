@@ -9,6 +9,10 @@ const register = async ({ username, password }) => {
         data: {
             username,
             password: hashedPassword
+        },
+        select: {
+            id: true,
+            username: true
         }
     });
 
@@ -17,4 +21,26 @@ const register = async ({ username, password }) => {
     return { user, token };
 };
 
-export default { register };
+const login = async ({ username, password }) => {
+    const userData = await prisma.user.findUnique({
+        where: { username }
+    });
+
+    if (!userData) {
+        throw new Error('Invalid username');
+    };
+
+    const isPasswordMatch = await bcrypt.compare(password, userData.password);
+
+    if (!isPasswordMatch) {
+        throw new Error('Invalid password');
+    };
+
+    const { password: _, ...user } = userData;
+
+    const token = generateToken(user);
+
+    return { user, token };
+};
+
+export default { register, login };
