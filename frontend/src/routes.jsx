@@ -1,3 +1,4 @@
+import RootLayout from "./layouts/RootLayout";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Reguster";
@@ -5,7 +6,13 @@ import Register from "./pages/Reguster";
 const routes = [
     {
         path: '/',
-        element: <Home />,
+        element: <RootLayout />,
+        children: [
+            {
+                index: true,
+                element: <Home />,
+            }
+        ]
     },
     {
         path: '/register',
