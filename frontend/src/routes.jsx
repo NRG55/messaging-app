@@ -1,7 +1,7 @@
-import RootLayout from "./layouts/RootLayout";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Register from "./pages/Reguster";
+import RootLayout from './layouts/RootLayout';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Reguster';
 
 const routes = [
     {
@@ -11,8 +11,8 @@ const routes = [
             {
                 index: true,
                 element: <Home />,
-            }
-        ]
+            },
+        ],
     },
     {
         path: '/register',
