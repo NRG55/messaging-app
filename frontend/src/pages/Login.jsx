@@ -1,19 +1,10 @@
-import AuthForm from '../components/AuthForm';
+import LoginForm from '../components/forms/LoginForm';
 
 export default function Login() {
-    const errors = [];
-
-    const handleLogin = async () => {
-        console.log('Log in');
-    };
 
     return (
         <div className="flex min-h-screen w-screen items-center justify-center px-4">
-            <AuthForm
-                type="login"
-                onSubmit={handleLogin}
-                errors={errors} 
-            />
+            <LoginForm />
         </div>
     );
 };
