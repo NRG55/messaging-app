@@ -8,8 +8,9 @@ datasource db {
 }
 
 model User {
-    id        String   @id @default(uuid())
-    username  String   @unique
-    password  String
-    createdAt DateTime @default(now())
+    id                 String   @id @default(uuid())
+    username           String   // saved in original casing (example: "JohnDoe") to show on the frontend
+    normalizedUsername String   @unique // saved in lowercase (e.g., "johndoe") to prevent duplicate accounts
+    password           String
+    createdAt          DateTime @default(now())
 }

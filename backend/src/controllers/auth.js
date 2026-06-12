@@ -1,6 +1,6 @@
 import authService from '../services/auth.js'
 
-const register = async (req, res) => {
+export const register = async (req, res) => {
     try {
         const data = await authService.register(req.body);
         
@@ -19,7 +19,7 @@ const register = async (req, res) => {
     };
 };
 
-const login = async(req, res) => {
+export const login = async(req, res) => {
     try {
         const data = await authService.login(req.body);
 
@@ -37,5 +37,3 @@ const login = async(req, res) => {
         res.status(401).json({ errors: [{ msg: error.message }] });
     };
 };
-
-export default { register, login };
