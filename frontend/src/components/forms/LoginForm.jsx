@@ -1,16 +1,14 @@
 import { Link } from 'react-router';
 import Input from '../Input';
 import PasswordInput from '../PasswordInput';
+import useForm from '../../hooks/useForm';
+import { loginUser } from '../../api/auth';
 
 export default function LoginForm() {
-    const errors =[{ msg: 'Error 1' }, { msg: 'Error 2' }];
-
-    const handleLogin = async () => {
-
-    };
+    const { errors, loading, handleSubmit } = useForm(loginUser);
 
     return (
-        <form onSubmit={handleLogin} className="w-[80%] max-w-100">
+        <form onSubmit={handleSubmit} className="w-[80%] max-w-100">
             <h1 className="text-3xl text-center mb-18">
                 Welcome Back
             </h1>
@@ -26,19 +24,22 @@ export default function LoginForm() {
                 name="username"
                 placeholder="Username"
                 required
+                disabled={loading}
             />
 
             <PasswordInput
                 name="password"
                 placeholder="Password"
                 required
+                disabled={loading}
             />
 
             <button
                 type="submit"
+                disabled={loading}
                 className="cursor-pointer w-full bg-black text-white rounded-xs py-2 px-6 mt-6 hover:bg-gray-700 transition-colors"                
             >
-                Log in
+                {loading ? 'Logging in...' : 'Log in'}
             </button>
 
             <p className="mt-15 text-gray-400 text-center">
@@ -55,9 +56,9 @@ export default function LoginForm() {
             </div>
 
             <p className="text-gray-400 text-center">
-                Continue without registration
+                Back to 
                 <Link to="/" className="underline text-black ml-2">
-                    Home
+                    Homepage
                 </Link>
             </p>
         </form>
