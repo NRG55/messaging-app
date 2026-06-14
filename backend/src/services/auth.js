@@ -2,57 +2,59 @@ import bcrypt from 'bcrypt';
 import prisma from '../config/prisma.js';
 import generateToken from '../utils/generateToken.js';
 
-export const register = async ({ username, password }) => {
-    const originalUsername = username.trim();
-    const lowercaseUsername = originalUsername.toLowerCase();
-
+const register = async ({ username, password }) => {
     const existingUser = await prisma.user.findUnique({
-        where: { normalizedUsername: lowercaseUsername }
+        where: { username },
     });
-
+    
     if (existingUser) {
         throw new Error('Username already exists. Please try another one!');
-    };
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await prisma.user.create({
+    const createdUser = await prisma.user.create({
         data: {
-            username: originalUsername,
-            normalizedUsername: lowercaseUsername,
-            password: hashedPassword
-        },
-        select: {
-            id: true,
-            username: true
-        }
+            username,
+            password: hashedPassword,
+        },        
     });
 
-    const token = generateToken(user);
+    const user = {
+        id: createdUser.id,
+        username: createdUser.username,
+        avatarUrl: createdUser.avatarUrl,
+        bio: createdUser.bio || '',
+    };
+
+    const token = generateToken(user.id, user.username);
 
     return { user, token };
 };
 
-const login = async ({ username, password }) => {   
-    const lowercaseUsername = username.trim().toLowerCase();
-   
+const login = async ({ username, password }) => {
     const userData = await prisma.user.findUnique({
-        where: { normalizedUsername: lowercaseUsername }
+        where: { username },
     });
-   
+
     if (!userData) {
         throw new Error('Invalid username or password');
-    };
+    }
 
     const isPasswordMatch = await bcrypt.compare(password, userData.password);
 
     if (!isPasswordMatch) {
         throw new Error('Invalid username or password');
-    };
-    
-    const { password: _, normalizedUsername: __, ...user } = userData;
+    }
 
-    const token = generateToken(user);
+    const user = {
+        id: userData.id,
+        username: userData.username,
+        avatarUrl: userData.avatarUrl,
+        bio: userData.bio || '',
+    };
+
+    const token = generateToken(user.id, user.username);
 
     return { user, token };
 };

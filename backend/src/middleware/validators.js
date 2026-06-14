@@ -6,7 +6,7 @@ export const handleValidtionErrors = (req, res, next) => {
 
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
-    };
+    }
 
     next();
 };
@@ -20,24 +20,23 @@ export const loginValidator = [
 
     body('password')
         .trim()
-        .notEmpty().withMessage(`Password cannot be empty.`)
+        .notEmpty().withMessage('Password cannot be empty.')
         .bail()
         .isLength({ min: 5, max: 16 }).withMessage('Password must be between 5 and 16 characters.'),
 
-    handleValidtionErrors
+    handleValidtionErrors,
 ];
 
 export const registerValidator = [    
     body('username')
         .trim()
-        .notEmpty().withMessage(`Username is required`)
+        .notEmpty().withMessage('Username is required')
         .bail()
         .isLength({ min: 1, max: 16 }).withMessage('Username must be between 1 and 16 characters.')
         .bail()
         .custom(async (username) => {
-            const lowercaseUsername = username.toLowerCase();
             const user = await prisma.user.findUnique({
-                where: { normalizedUsername: lowercaseUsername },
+                where: { username },
             });
 
             if (user) {
@@ -63,5 +62,5 @@ export const registerValidator = [
             return true;
         }),
 
-    handleValidtionErrors
+    handleValidtionErrors,
 ];
