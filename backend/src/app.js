@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import authRoutes from './routes/auth.routes.js';
+import errorHandler from './middleware/errorHandler.js';
 
 const app = express();
 
@@ -18,6 +19,8 @@ app.get('/', (req, res) => {
 });
 
 app.use('/auth', authRoutes);
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 

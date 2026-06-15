@@ -8,7 +8,7 @@ const register = async ({ username, password }) => {
     });
     
     if (existingUser) {
-        throw new Error('Username already exists. Please try another one!');
+        throw new Error('USERNAME_TAKEN');
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -38,13 +38,13 @@ const login = async ({ username, password }) => {
     });
 
     if (!userData) {
-        throw new Error('Invalid username or password');
+        throw new Error('INVALID_CREDENTIALS');
     }
 
     const isPasswordMatch = await bcrypt.compare(password, userData.password);
 
     if (!isPasswordMatch) {
-        throw new Error('Invalid username or password');
+        throw new Error('INVALID_CREDENTIALS');
     }
 
     const user = {
