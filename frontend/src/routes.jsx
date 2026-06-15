@@ -1,12 +1,14 @@
-import RootLayout from './layouts/RootLayout';
+import Layout from './layout/Layout';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import NotFound from './pages/NotFound';
 import Register from './pages/Reguster';
 
 const routes = [
     {
         path: '/',
-        element: <RootLayout />,
+        errorElement: <NotFound />,
+        element: <Layout />,
         children: [
             {
                 index: true,

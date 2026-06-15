@@ -6,12 +6,9 @@ import stylistic from '@stylistic/eslint-plugin';
 import globals from 'globals';
 
 export default [
-    // 1. GLOBAL IGNORES (Replaces old ignorePatterns)
     {
         ignores: ['dist', 'node_modules', 'build'],
     },
-
-    // 2. CORE APPLICATION RULES CODE CONFIGURATION
     {
         files: ['**/*.{js,jsx}'],
         languageOptions: {
@@ -25,7 +22,6 @@ export default [
             },
         },
         plugins: {
-            // Register standard industry extension systems
             '@js': js,
             'react': reactPlugin,
             'react-hooks': reactHooks,
@@ -45,6 +41,7 @@ export default [
             // --- CORE JAVASCRIPT & REACT LOGIC ---
             'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }], // Flags unused code variables safely
             'no-console': ['warn', { allow: ['warn', 'error'] }],    // Discourages leaving debug consoles in builds
+            'no-extra-semi': 'error',
             'react/react-in-jsx-scope': 'off',                       // Disabled: React 17+ doesn't need imports on top
             'react/prop-types': 'off',                               // Disabled: Modern code uses parameters directly
 
