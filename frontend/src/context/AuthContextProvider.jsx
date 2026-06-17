@@ -11,9 +11,11 @@ export default function AuthContextProvider({ children }) {
 
         try {
             return JSON.parse(savedUser);
+
         } catch (error) {
             console.error('Could not parse localStorage userProfile data, userProfile is removed:', error);
             localStorage.removeItem('userProfile');
+
             return null;
         }
     });
@@ -22,7 +24,7 @@ export default function AuthContextProvider({ children }) {
         setUser(userData);
         localStorage.setItem('userProfile', JSON.stringify(userData));
     };
-   
+
     const logout = () => {
         setUser(null);
         localStorage.removeItem('userProfile');

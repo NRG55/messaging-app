@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
+import useAuth from './useAuth';
 
 export default function useForm(apiSubmitFunction) {
     const navigate = useNavigate();
+    const { login } = useAuth();
     const [errors, setErrors] = useState([]);
     const [loading, setLoading] = useState(false);
     
@@ -16,13 +18,12 @@ export default function useForm(apiSubmitFunction) {
         
         try {            
             const data = await apiSubmitFunction(payload);
-            
-            if (data.token) {
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user));
+
+            if (data.user) {
+                login(data.user);
             }
 
-            navigate('/');
+            navigate('/dashboard');
 
         } catch (error) {
             if (error && error.responseData) {

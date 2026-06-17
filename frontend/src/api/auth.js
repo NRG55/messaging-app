@@ -17,6 +17,7 @@ export const registerUser = async (payload) => {
     const response = await fetch(`${BASE_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(payload),
     });
 
@@ -27,8 +28,19 @@ export const loginUser = async (payload) => {
     const response = await fetch(`${BASE_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(payload),
     });
-    
+
+    return handleResponse(response);
+};
+
+export const logoutUser = async () => {
+    const response = await fetch(`${BASE_URL}/logout`, {
+        method: 'POST',        
+        credentials: 'include', 
+        headers: { 'Content-Type': 'application/json' },
+    });
+
     return handleResponse(response);
 };
