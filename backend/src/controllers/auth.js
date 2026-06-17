@@ -43,3 +43,21 @@ export const login = async(req, res, next) => {
         next(error);
     }
 };
+
+export const logout = async (req, res, next) => {
+    try {
+        res.clearCookie('authToken', {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Logged out successfully.',
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
