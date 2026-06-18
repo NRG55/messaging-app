@@ -1,11 +1,23 @@
-import { Link } from 'react-router';
-import Input from '../Input';
-import PasswordInput from '../PasswordInput';
+import { Link, useNavigate } from 'react-router';
+import useAuth from '../../hooks/useAuth';
 import useForm from '../../hooks/useForm';
 import { loginUser } from '../../api/auth';
+import Input from '../Input';
+import PasswordInput from '../PasswordInput';
 
 export default function LoginForm() {
-    const { errors, loading, handleSubmit } = useForm(loginUser);
+    const navigate = useNavigate();
+    const { login } = useAuth();
+    const { submitForm, loading, errors } = useForm(loginUser);
+
+    const handleSubmit = async (e) => {
+        const data = await submitForm(e);
+        
+        if (data) {
+            login(data.user);
+            navigate('/dashboard');
+        }
+    };
 
     return (
         <form onSubmit={handleSubmit} className="w-[80%] max-w-100">

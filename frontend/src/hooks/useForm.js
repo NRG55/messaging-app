@@ -1,14 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
-import useAuth from './useAuth';
 
 export default function useForm(apiSubmitFunction) {
-    const navigate = useNavigate();
-    const { login } = useAuth();
     const [errors, setErrors] = useState([]);
     const [loading, setLoading] = useState(false);
     
-    const handleSubmit = async (e) => {       
+    const submitForm = async (e) => {       
         e.preventDefault();
         setErrors([]);
         setLoading(true);
@@ -19,11 +15,7 @@ export default function useForm(apiSubmitFunction) {
         try {            
             const data = await apiSubmitFunction(payload);
 
-            if (data.user) {
-                login(data.user);
-            }
-
-            navigate('/dashboard');
+            return data;
 
         } catch (error) {
             if (error && error.responseData) {
@@ -41,13 +33,15 @@ export default function useForm(apiSubmitFunction) {
                 setErrors([{ msg: 'Cannot connect to server. Please try again later.' }]);
             }
 
+            return null;
+
         } finally {
             setLoading(false);
         }
     };
 
     return {
-        handleSubmit,
+        submitForm,
         loading,
         errors,        
     };
