@@ -1,0 +1,95 @@
+
+import { useState } from 'react';
+import useAuth from '../../hooks/useAuth.js';
+import Input from '../Input.jsx';
+
+export default function EditProfileForm() {
+    const { user } = useAuth();
+    const [bioCharactersCount, setBioCharactersCount] = useState(user?.bio?.length || 0);    
+
+    const handleSubmit = async () => {        
+        console.log('Save profile clicked');
+    };    
+
+    return (
+        <div className="w-full max-w-2xl bg-white border border-gray-200 rounded-xs p-6">
+            <div className="border-b border-gray-100 pb-4 mb-6">
+                <h3 className="text-lg font-bold text-gray-800">
+                    Edit Profile
+                </h3>                
+            </div>            
+            
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">               
+                <div className="flex flex-col gap-2">
+                    <label className="text-xs tracking-wider text-gray-400">
+                        Avatar
+                    </label>
+                    
+                    <div className="w-14 h-14 rounded-full bg-gray-400"></div> 
+                </div>
+               
+                <div className="flex flex-col gap-1.5">
+                    <label 
+                        htmlFor="username" 
+                        className="text-xs tracking-wider text-gray-400"
+                    >
+                        Username
+                    </label>
+                    
+                    <Input
+                        type="text" 
+                        id="username"
+                        name="username" 
+                        required 
+                        defaultValue={user?.username || ''}
+                        placeholder="Enter your username"                        
+                    />                    
+                </div>
+                
+                <div className="flex flex-col gap-1.5">
+                    <div className="flex justify-between items-center w-full">
+                        <label 
+                            htmlFor="bio" 
+                            className="text-xs tracking-wider text-gray-400"
+                        >
+                            Bio
+                        </label>
+                       
+                        <span className={`text-xs font-medium ${bioCharactersCount > 150 ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
+                            {bioCharactersCount} / 160
+                        </span>
+                    </div>
+
+                    <textarea 
+                        id="bio"
+                        name="bio" 
+                        rows={4}
+                        maxLength={160}
+                        defaultValue={user?.bio || ''}
+                        onChange={(e) => setBioCharactersCount(e.target.value.length)}
+                        placeholder="Tell a little bit about yourself..."
+                        className="w-full rounded-xs px-4 py-2 bg-gray-100 
+                                placeholder:text-gray-400 
+                                focus:bg-transparent focus:outline focus:outline-black resize-none transition-colors"
+                    />
+                </div>
+
+                <div className="flex items-center justify-end gap-3 border-t border-gray-100 pt-4 mt-2">
+                    <button 
+                        type="button"
+                        className="cursor-pointer text-black border border-black rounded-xs py-1 px-3 hover:text-gray-600 hover:border-gray-600 transition-colors"
+                    >
+                        Cancel
+                    </button>
+
+                    <button 
+                        type="submit"
+                        className="cursor-pointer bg-black text-white rounded-xs py-1 px-3 hover:bg-gray-700 transition-colors"
+                    >
+                        Save Profile
+                    </button>
+                </div>
+            </form>
+        </div>
+    );
+}
