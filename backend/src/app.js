@@ -1,24 +1,28 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import authRoutes from './routes/auth.routes.js';
+import cookieParser from 'cookie-parser';
+import authRouter from './routes/auth.js';
+import userRouter from './routes/user.js';
 import errorHandler from './middleware/errorHandler.js';
 
 const app = express();
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 app.use(cors({    
     origin: 'http://localhost:5173',
     credentials: true,   
 }));
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
 app.get('/', (req, res) => {
     res.send('Messaging app server is running!');
 });
 
-app.use('/auth', authRoutes);
+app.use('/auth', authRouter);
+app.use('/user', userRouter);
 
 app.use(errorHandler);
 

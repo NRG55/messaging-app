@@ -4,11 +4,11 @@ export const register = async (req, res, next) => {
     try {
         const data = await authService.register(req.body);
         
-        res.cookie('authToken', data.token, {
+        res.cookie('token', data.token, {
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
-            maxAge: 24 * 60 * 60 * 1000, // 1 day
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });        
         
         res.status(201).json({
@@ -26,11 +26,11 @@ export const login = async(req, res, next) => {
     try {
         const data = await authService.login(req.body);
 
-        res.cookie('authToken', data.token, {
+        res.cookie('token', data.token, {
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
-            maxAge: 24 * 60 * 60 * 1000, // 1 day
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
         
         res.status(200).json({
@@ -46,7 +46,7 @@ export const login = async(req, res, next) => {
 
 export const logout = async (req, res, next) => {
     try {
-        res.clearCookie('authToken', {
+        res.clearCookie('token', {
             httpOnly: true,
             secure: true,
             sameSite: 'strict',

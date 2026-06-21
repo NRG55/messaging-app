@@ -13,6 +13,16 @@ export default function errorHandler(err, req, res, _next) {
             clientMessage = 'Invalid username or password.';
             break;
 
+        case 'UNAUTHORIZED':
+            statusCode = 401;
+            clientMessage = 'Session expired or missing. Please login again.';
+            break;
+
+        case 'BIO_TOO_LONG':
+            statusCode = 400;
+            clientMessage = 'Bio cannot be longer than 160 characters.';
+            break;
+
         default:
             console.error('Unexpected Server Error:', err);
     }
