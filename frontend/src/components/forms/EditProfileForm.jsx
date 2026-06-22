@@ -2,17 +2,34 @@
 import { useState } from 'react';
 import useAuth from '../../hooks/useAuth.js';
 import Input from '../Input.jsx';
+import { updateUserProfile } from '../../api/auth.js';
+import useForm from '../../hooks/useForm.js';
 
 export default function EditProfileForm() {
-    const { user } = useAuth();
-    const [bioCharactersCount, setBioCharactersCount] = useState(user?.bio?.length || 0);    
+    const { user, updateUser } = useAuth();
+    const [bioCharactersCount, setBioCharactersCount] = useState(user?.bio?.length || 0);
 
-    const handleSubmit = async () => {        
-        console.log('Save profile clicked');
+    const { submitForm, loading, errors } = useForm(updateUserProfile);
+
+    const handleSubmit = async (e) => {        
+        e.preventDefault();        
+        
+        const data = await submitForm(e);
+        
+        if (data && data.user) {
+            updateUser(data.user);
+            console.log('Profile updated successfully!');            
+        }
     };    
 
     return (
         <div className="w-full max-w-2xl bg-white border border-gray-200 rounded-xs p-6">
+            {errors && errors.length > 0 && errors.map((error, index) => (
+                <p key={'error-' + index} className="mb-4 text-red-400">
+                    {error.msg}
+                </p>
+            ))}
+                
             <div className="border-b border-gray-100 pb-4 mb-6">
                 <h3 className="text-lg font-bold text-gray-800">
                     Edit Profile
@@ -84,9 +101,10 @@ export default function EditProfileForm() {
 
                     <button 
                         type="submit"
-                        className="cursor-pointer bg-black text-white rounded-xs py-1 px-3 hover:bg-gray-700 transition-colors"
+                        disabled={loading}
+                        className="cursor-pointer bg-black text-white rounded-xs py-1 px-3 hover:bg-gray-700 transition-colors disabled:bg-gray-400"
                     >
-                        Save Profile
+                        {loading ? 'Saving...' : 'Save Profile'}
                     </button>
                 </div>
             </form>

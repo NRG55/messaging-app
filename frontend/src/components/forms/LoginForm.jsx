@@ -25,8 +25,8 @@ export default function LoginForm() {
                 Welcome Back
             </h1>
 
-            {errors && errors.map((error, i) => (
-                <p key={'error-' + i} className="mb-4 text-red-400">
+            {errors && errors.length > 0 && errors.map((error, index) => (
+                <p key={'error-' + index} className="mb-4 text-red-400">
                     {error.msg}
                 </p>
             ))}
@@ -49,7 +49,7 @@ export default function LoginForm() {
             <button
                 type="submit"
                 disabled={loading}
-                className="cursor-pointer w-full bg-black text-white rounded-xs py-2 px-6 mt-6 hover:bg-gray-700 transition-colors"                
+                className="cursor-pointer w-full bg-black text-white rounded-xs py-2 px-6 mt-6 hover:bg-gray-700 transition-colors"
             >
                 {loading ? 'Logging in...' : 'Log in'}
             </button>

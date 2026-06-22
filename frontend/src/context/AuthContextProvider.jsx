@@ -30,8 +30,21 @@ export default function AuthContextProvider({ children }) {
         localStorage.removeItem('userProfile');
     };
 
+    const updateUser = (userData) => {
+        setUser((prevUserData) => {
+            const updatedProfile = {
+                ...prevUserData,
+                ...userData,
+            };            
+            
+            localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+            
+            return updatedProfile;
+        });
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ user, login, logout, updateUser }}>
             {children}
         </AuthContext.Provider>
     );
