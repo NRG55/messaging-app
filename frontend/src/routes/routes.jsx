@@ -6,6 +6,7 @@ import Home from '../pages/Home';
 import Login from '../pages/Login';
 import NotFound from '../pages/NotFound';
 import Register from '../pages/Register';
+import Profile from '../components/Profile';
 
 const routes = [
     {
@@ -51,8 +52,8 @@ const routes = [
                         element: <h1>Groups</h1>,
                     },
                     {
-                        path: 'profile',
-                        element: <h1>Profile</h1>,
+                        path: 'profile/:id?',
+                        element: <Profile />,
                     },
                 ],
             },
