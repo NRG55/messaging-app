@@ -18,7 +18,6 @@ export default function EditProfileForm() {
         
         if (data && data.user) {
             updateUser(data.user);
-            console.log('Profile updated successfully!');            
         }
     };    
 
