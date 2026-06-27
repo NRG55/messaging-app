@@ -1,14 +1,14 @@
 import { Link, useNavigate } from 'react-router';
 import useAuth from '../../hooks/useAuth';
 import useForm from '../../hooks/useForm';
-import { registerUser } from '../../api/auth';
+import { registerUser } from '../../api';
 import Input from '../Input';
 import PasswordInput from '../PasswordInput';
 
 export default function RegisterForm() {
     const navigate = useNavigate();
     const { login } = useAuth();
-    const { submitForm, loading, errors } = useForm(registerUser);
+    const { submitForm, isSubmitting, errors } = useForm(registerUser);
 
     const handleSubmit = async (e) => {
         const data = await submitForm(e);
@@ -36,29 +36,29 @@ export default function RegisterForm() {
                 name="username"
                 placeholder="Username"
                 required
-                disabled={loading}
+                disabled={isSubmitting}
             />
 
             <PasswordInput
                 name="password"
                 placeholder="Password"
                 required
-                disabled={loading}
+                disabled={isSubmitting}
             />
 
             <PasswordInput
                 name="passwordConfirmation"
                 placeholder="Confirm password"
                 required
-                disabled={loading}
+                disabled={isSubmitting}
             />              
 
             <button
                 type="submit"
-                disabled={loading}
+                disabled={isSubmitting}
                 className="cursor-pointer w-full bg-black text-white rounded-xs py-2 px-6 mt-6 hover:bg-gray-700 transition-colors"                
             >
-                {loading ? 'Creating Account...' : 'Sign up'}
+                {isSubmitting ? 'Creating Account...' : 'Sign up'}
             </button>
 
             <p className="mt-15 text-gray-400 text-center">

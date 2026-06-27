@@ -2,12 +2,12 @@ import { useState } from 'react';
 
 export default function useForm(apiSubmitFunction) {
     const [errors, setErrors] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     
     const submitForm = async (e) => {       
         e.preventDefault();
         setErrors([]);
-        setLoading(true);
+        setIsSubmitting(true);
        
         const formData = new FormData(e.target);
         const payload = Object.fromEntries(formData.entries());
@@ -36,13 +36,13 @@ export default function useForm(apiSubmitFunction) {
             return null;
 
         } finally {
-            setLoading(false);
+            setIsSubmitting(false);
         }
     };
 
     return {
         submitForm,
-        loading,
+        isSubmitting,
         errors,        
     };
 }

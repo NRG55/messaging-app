@@ -1,23 +1,44 @@
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import useAuth from '../../hooks/useAuth.js';
 import Input from '../Input.jsx';
-import { updateUserProfile } from '../../api/auth.js';
+import { updateUserProfile, uploadImageToCloudinary } from '../../api';
 import useForm from '../../hooks/useForm.js';
+import { Camera } from 'lucide-react';
 
 export default function EditProfileForm() {
     const { user, updateUser } = useAuth();
     const [bioCharactersCount, setBioCharactersCount] = useState(user?.bio?.length || 0);
+    const [avatarFile, setAvatarFile] = useState(null);
 
-    const { submitForm, loading, errors } = useForm(updateUserProfile);
+    const fileInputRef = useRef(null);
+
+    const { submitForm, isSubmitting, errors } = useForm(updateUserProfile);
 
     const handleSubmit = async (e) => {        
-        e.preventDefault();        
+        e.preventDefault();
         
-        const data = await submitForm(e);
+        try {             
+            let avatarUrl = user?.avatarUrl || '';
+            
+            if (avatarFile) {
+                const cloudinaryData = await uploadImageToCloudinary(avatarFile);
+
+                if (cloudinaryData.secure_url) {
+                    avatarUrl = cloudinaryData.secure_url;
+                    e.target.elements.avatarUrl.value = avatarUrl; 
+                }
+            }
+            
+            const data = await submitForm(e);
         
-        if (data && data.user) {
-            updateUser(data.user);
+            if (data && data.user) {
+                updateUser(data.user);
+                setAvatarFile(null);
+            }
+
+        } catch (error) {
+            console.error('Failed to update profile:', error);
         }
     };    
 
@@ -41,7 +62,48 @@ export default function EditProfileForm() {
                         Avatar
                     </label>
                     
-                    <div className="w-14 h-14 rounded-full bg-gray-400"></div> 
+                    <div className="flex items-center gap-4">
+                        <input 
+                            type="file"
+                            ref={fileInputRef}
+                            disabled={isSubmitting}
+                            onChange={(e) => setAvatarFile(e.target.files[0])}
+                            accept="image/*"
+                            className="hidden"
+                        />
+
+                        <input 
+                            type="hidden" 
+                            name="avatarUrl" 
+                            value={avatarFile ? URL.createObjectURL(avatarFile) : (user?.avatarUrl || '')} 
+                        />
+
+                        <button
+                            type="button"
+                            disabled={isSubmitting}
+                            onClick={() => fileInputRef.current?.click()}
+                            className="group relative w-20 h-20 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center cursor-pointer border border-gray-100 disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none transition-all"
+                            aria-label="Change profile picture"
+                        >
+                               
+                            <img 
+                                src={
+                                    avatarFile === null 
+                                        ? user.avatarUrl
+                                        : URL.createObjectURL(avatarFile)
+                                }
+                                alt="Profile avatar" 
+                                className="w-full h-full object-cover"
+                            />
+
+                            <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center gap-1 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity">
+                                <Camera size={18} className="text-white" />
+                                <span className="text-[10px] font-bold text-white tracking-wide">
+                                    Edit
+                                </span>
+                            </div>
+                        </button>                        
+                    </div>
                 </div>
                
                 <div className="flex flex-col gap-1.5">
@@ -100,10 +162,10 @@ export default function EditProfileForm() {
 
                     <button 
                         type="submit"
-                        disabled={loading}
+                        disabled={isSubmitting}
                         className="cursor-pointer bg-black text-white rounded-xs py-1 px-3 hover:bg-gray-700 transition-colors disabled:bg-gray-400"
                     >
-                        {loading ? 'Saving...' : 'Save Profile'}
+                        {isSubmitting ? 'Saving...' : 'Save Profile'}
                     </button>
                 </div>
             </form>
