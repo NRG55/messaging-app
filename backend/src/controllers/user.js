@@ -1,5 +1,22 @@
 import * as userService from '../services/user.js';
 
+export const getProfile = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+       
+        if (!id || id.length !== 36) {
+            throw new Error('INVALID_USER_ID');
+        }
+        
+        const userProfile = await userService.getUserProfile(id);
+
+        return res.status(200).json(userProfile);
+
+    } catch (error) {        
+        next(error);
+    }
+};
+
 export const updateProfile = async (req, res, next) => {
     try {
         const userId = req.user?.id;

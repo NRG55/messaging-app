@@ -18,6 +18,16 @@ export default function errorHandler(err, req, res, _next) {
             clientMessage = 'Session expired or missing. Please login again.';
             break;
 
+        case 'INVALID_USER_ID':
+            statusCode = 400;
+            clientMessage = 'Invalid user ID.';
+            break;
+       
+        case 'USER_NOT_FOUND':
+            statusCode = 404; // Not Found
+            clientMessage = 'User does not exist.';
+            break;
+
         case 'BIO_TOO_LONG':
             statusCode = 400;
             clientMessage = 'Bio cannot be longer than 160 characters.';

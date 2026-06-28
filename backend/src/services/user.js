@@ -1,6 +1,25 @@
 import prisma from '../config/prisma.js';
 import cloudinary from '../config/cloudinary.js';
 
+export const getUserProfile = async (userId) => {
+    const userProfile = await prisma.user.findUnique({
+        where: { id: userId },       
+        select: {
+            id: true,
+            username: true,
+            avatarUrl: true,
+            bio: true,
+            createdAt: true,
+        },
+    });
+
+    if (!userProfile) {
+        throw new Error('USER_NOT_FOUND');
+    }
+
+    return userProfile;
+};
+
 export const updateUserProfile = async (userId, userProfile) => {
     const { username, avatarUrl, bio } = userProfile;
     const data = {};
@@ -49,7 +68,7 @@ export const updateUserProfile = async (userId, userProfile) => {
                     const urlParts = currentUser.avatarUrl.split('/');
                     const fileWithExtension = urlParts[urlParts.length - 1]; // abcdefg123.png                    
 
-                    const publicId = fileWithExtension.split('.')[0]; // abcdefg123.png
+                    const publicId = fileWithExtension.split('.')[0]; // abcdefg123
 
                     await cloudinary.uploader.destroy(publicId);
 
