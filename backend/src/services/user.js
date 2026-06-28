@@ -89,3 +89,16 @@ export const updateUserProfile = async (userId, userProfile) => {
         throw error;
     }
 };
+
+export const getUsersNameAndAvatar = async () => {
+    return await prisma.user.findMany({
+        select: {
+            id: true,
+            username: true,
+            avatarUrl: true,
+        },
+        orderBy: {
+            username: 'asc',
+        },
+    });
+};
