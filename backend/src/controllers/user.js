@@ -1,5 +1,26 @@
 import * as userService from '../services/user.js';
 
+export const getMe = async (req, res, next) => {
+    try {       
+        const id = req.user?.id;
+
+        if (!id) {
+            throw new Error('UNAUTHORIZED');
+        }
+
+        const profile = await userService.getUserProfile(id);
+        
+        if (!profile) {
+            throw new Error('USER_NOT_FOUND');
+        }
+
+        return res.status(200).json(profile);
+
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const getProfile = async (req, res, next) => {
     try {
         const { id } = req.params;
