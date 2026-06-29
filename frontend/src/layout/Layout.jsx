@@ -1,17 +1,17 @@
 import { Outlet } from 'react-router';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import DesktopSideNav from '../components/DesktopSideNav';
+import MobileBottomNav from '../components/MobileBottomNav';
 
 export default function Layout() {
     return (
-        <div className="flex flex-col min-h-screen">
-            <Header />
+        <div className="min-h-screen w-full flex flex-col md:flex-row pb-16 md:pb-0">            
+            <DesktopSideNav />
 
-            <main className="grow">
+            <main className="flex-1 w-full overflow-y-auto p-4 sm:p-6">               
                 <Outlet />
             </main>
-
-            <Footer />
+           
+            <MobileBottomNav />
         </div>
     );
 }

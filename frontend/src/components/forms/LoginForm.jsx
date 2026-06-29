@@ -15,7 +15,7 @@ export default function LoginForm() {
         
         if (data) {
             login(data.user);
-            navigate('/dashboard');
+            navigate('/messages');
         }
     };
 

@@ -6,20 +6,14 @@ import Home from '../pages/Home';
 import Login from '../pages/Login';
 import NotFound from '../pages/NotFound';
 import Register from '../pages/Register';
-import Profile from '../components/Profile';
-import Friends from '../components/Friends';
+import Profile from '../pages/Profile';
+import Friends from '../pages/Friends';
 
 const routes = [
     {
         path: '/',
         errorElement: <NotFound />,
-        element: <Layout />,
-        children: [
-            {
-                index: true,
-                element: <Home />,
-            },
-        ],
+        element: <Home />,
     },
     {
         path: '/register',
@@ -33,27 +27,22 @@ const routes = [
         element: <ProtectedRoute />,
         children: [
             {
-                path: '/dashboard',
-                element: <Dashboard />,
+                element: <Layout />,
                 children: [
                     {
-                        index: true,
-                        element: <Navigate to="messages" replace />,
-                    },
-                    {
-                        path: 'messages',
+                        path: '/messages',
                         element: <h1>Messages</h1>,
                     },                    
                     {
-                        path: 'friends',
+                        path: '/friends',
                         element: <Friends />,
                     },
                     {
-                        path: 'groups',
+                        path: '/groups',
                         element: <h1>Groups</h1>,
                     },
                     {
-                        path: 'profile/:id?',
+                        path: '/profile/:id?',
                         element: <Profile />,
                     },
                 ],

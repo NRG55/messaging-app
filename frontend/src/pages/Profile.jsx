@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { ChevronLeft, Edit2 } from 'lucide-react'; 
 import useAuth from '../hooks/useAuth.js';
-import EditProfileForm from './forms/EditProfileForm.jsx';
+import EditProfileForm from '../components/forms/EditProfileForm.jsx';
+import { getPublicProfile } from '../api/index.js';
 
 export default function Profile() {
     const { user } = useAuth();
-    const { id: profileId } = useParams(); 
+    const { id: userId } = useParams(); 
  
     const [searchParams, setSearchParams] = useSearchParams();
     const isEditing = searchParams.get('edit') === 'true';
@@ -14,7 +15,7 @@ export default function Profile() {
     const [profileData, setProfileData] = useState(null);
     const [loading, setLoading] = useState(false);   
     
-    const isOwnProfile = !profileId || String(user?.id) === String(profileId);
+    const isOwnProfile = !userId || String(user?.id) === String(userId);
 
     useEffect(() => {       
         if (isOwnProfile) {
@@ -26,7 +27,11 @@ export default function Profile() {
             setLoading(true);
 
             try {
-                // TODO: api
+                const data = await getPublicProfile(userId);
+
+                if (data) {
+                    setProfileData(data);
+                }
 
             } catch (error) {
                 console.error('Failed to load user profile', error);
@@ -37,14 +42,14 @@ export default function Profile() {
         };
 
         fetchPublicProfile();
-    }, [profileId, user, isOwnProfile]);
+    }, [userId, user, isOwnProfile]);
    
     const handleSendMessage = () => {
-        console.log(`Send message ${profileId}`);
+        console.log(`Send message ${userId}`);
     };        
 
     const handleFriendRequest = () => {
-        console.log(`Friend request ${profileId}`);       
+        console.log(`Friend request ${userId}`);       
     };
 
     if (loading) {

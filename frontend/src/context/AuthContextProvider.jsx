@@ -35,6 +35,14 @@ export default function AuthContextProvider({ children }) {
 
     useEffect(() => {
         const verifySession = async () => {
+            const userProfile = localStorage.getItem('userProfile');
+            
+            if (!userProfile) {
+                logout();
+                setLoading(false);
+                return;
+            }
+
             try {
                 const me = await getMe();
 

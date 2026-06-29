@@ -1,11 +1,12 @@
 import { NavLink } from 'react-router';
-import { MessageSquare, UsersRound, MessagesSquare, User } from 'lucide-react';
+import { MessageSquare, MessagesSquare, User, UserRoundCheck, Users } from 'lucide-react';
 
 const navItems = [    
-    { icon: MessageSquare, label: 'Messages', path: '/dashboard/messages' },
-    { icon: UsersRound, label: 'Friends', path: '/dashboard/friends' },    
-    { icon: MessagesSquare, label: 'Groups', path: '/dashboard/groups' },
-    { icon: User, label: 'Profile', path: '/dashboard/profile' },
+    { icon: MessagesSquare, label: 'Chat', path: '/chat' },    
+    { icon: MessageSquare, label: 'Messages', path: '/messages' },
+    { icon: UserRoundCheck, label: 'Friends', path: '/friends' },    
+    { icon: Users, label: 'Groups', path: '/groups' },
+    { icon: User, label: 'Profile', path: '/profile' },
 ];
 
 export default function MobileBottomNav() {
