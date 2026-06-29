@@ -7,6 +7,7 @@ import Login from '../pages/Login';
 import NotFound from '../pages/NotFound';
 import Register from '../pages/Register';
 import Profile from '../components/Profile';
+import Friends from '../components/Friends';
 
 const routes = [
     {
@@ -45,7 +46,7 @@ const routes = [
                     },                    
                     {
                         path: 'friends',
-                        element: <h1>Friends</h1>,
+                        element: <Friends />,
                     },
                     {
                         path: 'groups',

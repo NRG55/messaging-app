@@ -1,24 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import AuthContext from './AuthContext.js';
+import { getMe, onSessionExpired } from '../api/index.js';
 
 export default function AuthContextProvider({ children }) {
-    const [user, setUser] = useState(() => {
-        const savedUser = localStorage.getItem('userProfile');
-
-        if (!savedUser) {
-            return null;
-        }
-
-        try {
-            return JSON.parse(savedUser);
-
-        } catch (error) {
-            console.error('Could not parse localStorage userProfile data, userProfile is removed:', error);
-            localStorage.removeItem('userProfile');
-
-            return null;
-        }
-    });
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const login = (userData) => {
         setUser(userData);
@@ -43,8 +29,34 @@ export default function AuthContextProvider({ children }) {
         });
     };
 
+    useEffect(() => {
+        onSessionExpired(logout);
+    }, []);
+
+    useEffect(() => {
+        const verifySession = async () => {
+            try {
+                const me = await getMe();
+
+                login(me);
+
+            } catch {
+                logout();
+
+            } finally {
+                setLoading(false); 
+            }
+        };
+
+        verifySession();
+    }, []);
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
     return (
-        <AuthContext.Provider value={{ user, login, logout, updateUser }}>
+        <AuthContext.Provider value={{ user, login, logout, updateUser, loading }}>
             {children}
         </AuthContext.Provider>
     );
