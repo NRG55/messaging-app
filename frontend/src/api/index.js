@@ -99,7 +99,7 @@ export const uploadImageToCloudinary = async (file) => {
     return handleResponse(response);
 };
 
-export const getPublicProfile = async (userId) => {
+export const getUserProfile = async (userId) => {
     const response = await fetch(`${SERVER_DOMAIN}/users/profile/${userId}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
