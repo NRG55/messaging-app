@@ -11,7 +11,7 @@ export default function UserProfile() {
     const [loading, setLoading] = useState(true);   
 
     useEffect(() => {       
-        const fetchTargetProfile = async () => {
+        const getProfileData = async () => {
             setLoading(true);
 
             try {
@@ -30,7 +30,7 @@ export default function UserProfile() {
             }
         };
 
-        fetchTargetProfile();
+        getProfileData();
     }, [userId, navigate]);
    
     const handleSendMessage = () => {

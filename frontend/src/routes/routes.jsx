@@ -14,14 +14,8 @@ const routes = [
         errorElement: <NotFound />,
         element: <Home />,
     },
-    {
-        path: '/register',
-        element: <Register />,
-    },
-    {
-        path: '/login',
-        element: <Login />,
-    },
+    { path: '/register', element: <Register /> },
+    { path: '/login', element: <Login /> },
     {
         element: <ProtectedRoute />,
         children: [
