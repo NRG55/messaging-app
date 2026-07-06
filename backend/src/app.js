@@ -4,6 +4,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import authRouter from './routes/auth.js';
 import userRouter from './routes/user.js';
+import chatRouter from './routes/chat.js';
 import errorHandler from './middleware/errorHandler.js';
 
 const app = express();
@@ -23,6 +24,7 @@ app.get('/', (req, res) => {
 
 app.use('/auth', authRouter);
 app.use('/users', userRouter);
+app.use('/chats', chatRouter);
 
 app.use(errorHandler);
 
