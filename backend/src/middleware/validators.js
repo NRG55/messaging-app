@@ -64,3 +64,11 @@ export const registerValidator = [
 
     handleValidtionErrors,
 ];
+
+export const messageValidator = [
+    body('text')
+        .trim()
+        .notEmpty().withMessage('Message cannot be empty.'),
+
+    handleValidtionErrors,
+];

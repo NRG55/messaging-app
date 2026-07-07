@@ -8,27 +8,27 @@ datasource db {
 }
 
 model User {
-    id        String      @id @default(uuid())
-    username  String      @unique
-    password  String
-    avatarUrl String?
-    bio       String?     @db.VarChar(160)
-    createdAt DateTime    @default(now())
+    id           String    @id @default(uuid())
+    username     String    @unique
+    password     String
+    avatarUrl    String?
+    bio          String?   @db.VarChar(160)
+    createdAt    DateTime  @default(now())
 
-    messages  Message[]
-    chats     ChatParticipant[] // ChatParticipant[] instead of Chat[] because User connects to ChatParticipant join table
+    messages     Message[]
+    chats        ChatParticipant[] // ChatParticipant[] instead of Chat[] because User connects to ChatParticipant join table
 }
 
 model Message {
-    id        String      @id @default(uuid())
-    text      String
-    createdAt DateTime    @default(now())
+    id           String   @id @default(uuid())
+    text         String
+    createdAt    DateTime @default(now())
 
-    senderId  String
-    sender    User        @relation(fields: [senderId], references: [id], onDelete: Cascade)
+    senderId     String
+    sender       User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
 
-    chatId    String    
-    chat      Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade)
+    chatId       String    
+    chat         Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
     }
 
 model Chat {
