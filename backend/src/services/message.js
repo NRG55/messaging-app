@@ -15,3 +15,19 @@ export const createMessage = async ({ text, chatId, senderId }) => {
         },
     });
 };
+
+export const getMessages = async (chatId) => {
+    return await prisma.message.findMany({
+        where: {
+            chatId: chatId,
+        },
+        orderBy: {
+            createdAt: 'asc',
+        },
+        include: {
+            sender: {
+                select: { id: true, username: true, avatarUrl: true },
+            },
+        },
+    });
+};

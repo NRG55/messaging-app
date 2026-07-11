@@ -15,3 +15,16 @@ export const createMessage = async (req, res) => {
         next(error);
     }
 };
+
+export const getMessages = async (req, res, next) => {
+    try {
+        const { chatId } = req.params;        
+       
+        const messages = await messageService.getMessages(chatId);
+
+        return res.status(200).json(messages);
+        
+    } catch (error) {
+        next(error);
+    }
+};
