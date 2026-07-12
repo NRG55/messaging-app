@@ -1,7 +1,6 @@
 import * as messageService from '../services/message.js';
 
 export const createMessage = async (req, res) => {
-
     try {
         const { text } = req.body;
         const { chatId } = req.params;
@@ -18,12 +17,13 @@ export const createMessage = async (req, res) => {
 
 export const getMessages = async (req, res, next) => {
     try {
-        const { chatId } = req.params;        
+        const { chatId } = req.params;
+        const userId = req.user.id;
        
-        const messages = await messageService.getMessages(chatId);
+        const messages = await messageService.getMessages(chatId, userId);
 
         return res.status(200).json(messages);
-        
+
     } catch (error) {
         next(error);
     }

@@ -33,6 +33,11 @@ export default function errorHandler(err, req, res, _next) {
             clientMessage = 'Bio cannot be longer than 160 characters.';
             break;
 
+        case 'CHAT_ACCESS_DENIED':
+            statusCode = 403; // Forbidden
+            clientMessage = 'Access denied. Not a chat participant.';
+            break;
+
         default:
             console.error('Unexpected Server Error:', err);
     }
