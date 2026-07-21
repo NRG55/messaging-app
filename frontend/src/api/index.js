@@ -139,14 +139,6 @@ export const createChat = async (recipientId) => {
     return handleResponse(response);
 };
 
-export const getChatMessages = async (chatId) => {
-    const response = await fetch(`${SERVER_DOMAIN}/chats/${chatId}/messages`, {
-        method: 'GET',
-        credentials: 'include',
-    });
-    return handleResponse(response);
-};
-
 export const createChatMessage = async (chatId, text) => {
     const response = await fetch(`${SERVER_DOMAIN}/chats/${chatId}/messages`, {
         method: 'POST',

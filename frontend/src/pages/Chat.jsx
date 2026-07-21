@@ -1,57 +1,56 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { ChevronLeft, Send } from 'lucide-react';
-import { getChat, createChat, getChatMessages, createChatMessage } from '../api';
+import { getChat, createChat, createChatMessage } from '../api';
 
 export default function Chat() {
-    const { id: recipientId } = useParams();
-    const navigate = useNavigate();    
-    const [recipient, setRecipient] = useState({ username: '', avatarUrl: '' });
-    const [messages, setMessages] = useState([]);
+    const { id: recipientId } = useParams();   
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(true);
-    const [chatId, setChatId] = useState(null);
+    const [chat, setChat] = useState({
+        id: null,
+        recipient: { username: '', avatarUrl: '' },
+        messages: [],
+    });
+    const navigate = useNavigate();
+    const bottomRef = useRef(null); 
 
     useEffect(() => {
         const initializeChat = async () => {
             setLoading(true);
 
             try {
-                let chat = null;
+                let chatData = null;
 
                 try {                
-                    chat = await getChat(recipientId);
+                    chatData = await getChat(recipientId);
 
                 } catch (error) {               
                     if (error.responseData?.error === 'Chat not found.' || error.status === 404) {
-                        chat = await createChat(recipientId);
+                        chatData = await createChat(recipientId);
 
                     } else {                    
                         throw error;
                     }
                 }
                 
-                const recipientData = chat.participants.find(({ user }) => user.id === recipientId)?.user;
-
-                if (recipientData) {
-                    setRecipient({
-                        username: recipientData.username || 'User',
-                        avatarUrl: recipientData.avatarUrl || '',
-                    });
-                }
-
-                setChatId(chat.id);           
-
-                const existingMessages = await getChatMessages(chat.id);
-
-                const formattedMessages = existingMessages.map((msg) => ({
+                const recipientData = chatData.participants?.find(({ user }) => user.id === recipientId)?.user;
+                
+                const formattedMessages = (chatData.messages || []).map((msg) => ({
                     id: msg.id,
                     text: msg.text,
                     sender: msg.senderId === recipientId ? 'Recipient' : 'Me',
                     time: new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 }));
 
-                setMessages(formattedMessages);
+                setChat({
+                    id: chatData.id,
+                    recipient: {
+                        username: recipientData?.username || 'User',
+                        avatarUrl: recipientData?.avatarUrl || '',
+                    },
+                    messages: formattedMessages,
+                });
 
             } catch (error) {
                 console.error('Failed to initialize chat:', error);
@@ -65,19 +64,25 @@ export default function Chat() {
         initializeChat();
     }, [recipientId, navigate]);
 
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({
+            behavior: 'smooth',
+        });
+    }, [chat.messages]);
+
     const handleSendMessage = async (e) => {
         e.preventDefault();
 
         const messageText = input.trim();
        
-        if (!messageText || !chatId) {
+        if (!messageText || !chat.id) {
             return;
         }
         
         setInput('');
 
         try {       
-            const createdMessage = await createChatMessage(chatId, messageText);
+            const createdMessage = await createChatMessage(chat.id, messageText);
 
             const newMessage = {
                 id: createdMessage.id,
@@ -86,7 +91,10 @@ export default function Chat() {
                 time: new Date(createdMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             };
 
-            setMessages((prev) => [...prev, newMessage]);
+            setChat((prev) => ({
+                ...prev,
+                messages: [...prev.messages, newMessage],
+            }));
 
         } catch (error) {
             console.error('Error delivering message:', error);
@@ -115,13 +123,13 @@ export default function Chat() {
                
                 <div className="flex items-center gap-2 max-w-[60%] overflow-hidden">                   
                     <div className="w-7 h-7 rounded-full bg-gray-200 overflow-hidden shrink-0 border border-gray-100 flex items-center justify-center font-bold text-gray-400 text-xs uppercase">
-                        {recipient.avatarUrl && (
-                            <img src={recipient.avatarUrl} alt="User avatar" className="w-full h-full object-cover" />
+                        {chat.recipient.avatarUrl && (
+                            <img src={chat.recipient.avatarUrl} alt="User avatar" className="w-full h-full object-cover" />
                         )}
                     </div>
 
                     <span className="text-sm font-semibold text-gray-800 truncate">
-                        {recipient.username || 'User'} {chatId}
+                        {chat.recipient.username || 'User'} {chat.id}
                     </span>
                 </div>
                
@@ -130,12 +138,12 @@ export default function Chat() {
             </header>
 
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
-                {messages.length === 0 ? (
+                {chat.messages.length === 0 ? (
                     <div className="text-center text-gray-400 mt-10 text-sm italic">
                         No messages yet. Start the conversation!
                     </div>
                 ) : (
-                    messages.map((message) => (
+                    chat.messages.map((message) => (
                         <div 
                             key={message.id} 
                             className={`px-4 py-2 rounded-xl max-w-[75%] ${
@@ -155,7 +163,7 @@ export default function Chat() {
                         </div>
                     ))
                 )}
-                <div />
+                <div ref={bottomRef} />
             </div>
 
             <form onSubmit={handleSendMessage} className="flex items-center p-3 bg-white border-t border-gray-200 gap-2 shrink-0 pb-safe z-10">
@@ -174,7 +182,6 @@ export default function Chat() {
                     <Send size={16} />
                 </button>
             </form>
-
         </div>
     );
 }
