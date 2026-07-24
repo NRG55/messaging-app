@@ -1,7 +1,7 @@
 import { useSearchParams } from 'react-router';
 import { ChevronLeft, Edit2 } from 'lucide-react'; 
-import useAuth from '../hooks/useAuth.js';
-import EditProfileForm from '../components/forms/EditProfileForm.jsx';
+import useAuth from '../../hooks/useAuth.js';
+import EditProfileForm from '../forms/EditProfileForm.jsx';
 
 export default function MyProfile() {
     const { user } = useAuth();

@@ -1,17 +1,15 @@
 import { NavLink } from 'react-router';
-import { MessageSquare, Users, MessagesSquare, User, UserRoundCheck } from 'lucide-react';
+import { Users, MessagesSquare, User } from 'lucide-react';
 
 const navItems = [
-    { icon: MessagesSquare, label: 'Chat', path: '/chat' },
-    { icon: MessageSquare, label: 'Messages', path: '/messages' },
-    { icon: UserRoundCheck, label: 'Friends', path: '/friends' },
+    { icon: MessagesSquare, label: 'Chat', path: '/' },
     { icon: Users, label: 'Groups', path: '/groups' },
     { icon: User, label: 'Profile', path: '/profile' },
 ];
 
-export default function DesktopSideNav() {
+export default function DesktopSidebar() {
     return (       
-        <aside className="hidden md:flex w-50 shrink-0 h-full border-r border-gray-200 flex-col p-4">
+        <aside className="hidden md:flex w-52 shrink-0 h-full border-r border-gray-200 flex-col p-4">
             <div className="pb-6 mb-6 border-b border-gray-100">
                 <h1 className="text-lg font-bold">
                     Messaging App

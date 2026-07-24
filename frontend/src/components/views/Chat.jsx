@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { ChevronLeft, Send } from 'lucide-react';
-import { getChat, createChat, createChatMessage } from '../api';
+import { getChat, createChat, createChatMessage } from '../../api';
 
 export default function Chat() {
-    const { id: recipientId } = useParams();   
+    const { userId: recipientId } = useParams();   
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(true);
     const [chat, setChat] = useState({

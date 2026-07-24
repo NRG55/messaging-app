@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router';
 import { LogOut, User } from 'lucide-react';
-import useAuth from '../hooks/useAuth';
+import useAuth from '../../hooks/useAuth';
 
 export default function MobileSideNav({ isOpen, onClose }) {
     const { user, logout } = useAuth();
@@ -8,8 +8,8 @@ export default function MobileSideNav({ isOpen, onClose }) {
 
     const sidebarItems = [
         { path: '/profile', label: 'Profile', icon: <User size={15} /> },
-        { path: '/profile', label: 'Button 2', icon: <User size={15} /> },
-        { path: '/profile', label: 'Button 3', icon: <User size={15} /> },
+        { path: '/path2', label: 'Button 2', icon: <User size={15} /> },
+        { path: '/path3', label: 'Button 3', icon: <User size={15} /> },
     ];
 
     const handleNavigation = (path) => {

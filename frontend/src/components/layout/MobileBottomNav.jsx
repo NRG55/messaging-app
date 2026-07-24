@@ -1,10 +1,8 @@
 import { NavLink } from 'react-router';
-import { MessageSquare, MessagesSquare, User, UserRoundCheck, Users } from 'lucide-react';
+import { MessageSquare, MessagesSquare, Users } from 'lucide-react';
 
 const navItems = [    
-    { icon: MessagesSquare, label: 'Public Chat', path: '/chat' },    
-    { icon: MessageSquare, label: 'Messages', path: '/messages' },
-    { icon: UserRoundCheck, label: 'Friends', path: '/friends' },    
+    { icon: MessagesSquare, label: 'Public Chat', path: '/chat' },   
     { icon: Users, label: 'Groups', path: '/groups' },
 ];
 

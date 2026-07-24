@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
-import useAuth from '../hooks/useAuth';
+import useAuth from '../../hooks/useAuth';
 import MobileSideNav from './MobileSideNav';
 
 const HEADER_TITLES = [
+    { route: '/chat', title: 'Public Chat' },
     { route: '/messages', title: 'Messages' },
     { route: '/friends', title: 'Friends' },
     { route: '/groups', title: 'Groups' },

@@ -1,16 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { ChevronLeft } from 'lucide-react';
-import { getUserProfile } from '../api';
+import { getUserProfile } from '../../api';
 
 export default function UserProfile() {
-    const { id: userId } = useParams();
+    const { userId } = useParams();
     const navigate = useNavigate();
     
     const [profileData, setProfileData] = useState(null);
     const [loading, setLoading] = useState(true);   
 
-    useEffect(() => {       
+    useEffect(() => {
+        if (!userId) {
+            setLoading(false);
+            return;
+        } 
+
         const getProfileData = async () => {
             setLoading(true);
 
@@ -34,7 +39,7 @@ export default function UserProfile() {
     }, [userId, navigate]);
    
     const handleSendMessage = () => {
-        console.log(`Send message to user with id: ${userId}`);
+        navigate(`/chat/${userId}`);
     };        
 
     const handleFriendRequest = () => {
