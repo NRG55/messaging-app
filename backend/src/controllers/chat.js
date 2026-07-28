@@ -1,5 +1,18 @@
 import * as chatService from '../services/chat.js';
 
+export const getPublicChat = async (req, res) => {
+    try {
+        const chat = await chatService.getPublicChat();       
+
+        return res.status(200).json(chat);
+
+    } catch (error) {
+        console.error('getPublicChat controller error:', error);
+
+        return res.status(500).json({ error: 'Internal server error getting public chat.' });
+    }
+};
+
 export const getChat = async (req, res) => {
     try {
         const { recipientId } = req.query;

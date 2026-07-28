@@ -1,19 +1,23 @@
 import prisma from '../config/prisma.js';
 
 export const createMessage = async ({ text, chatId, senderId }) => {
-    const isChatParticipant = await prisma.chatParticipant.findUnique({
-        where: {
-            userId_chatId: {
-                userId: senderId,
-                chatId: chatId,
+    const isPublicChat = chatId === 'publicChat';
+
+    if (!isPublicChat) {        
+        const isChatParticipant = await prisma.chatParticipant.findUnique({
+            where: {
+                userId_chatId: {
+                    userId: senderId,
+                    chatId: chatId,
+                },
             },
-        },
-    });
+        });
+       
+        if (!isChatParticipant) {
+            throw new Error('CHAT_ACCESS_DENIED');
+        }
+    }   
    
-    if (!isChatParticipant) {
-        throw new Error('CHAT_ACCESS_DENIED');
-    }
-    
     return await prisma.message.create({
         data: {
             text,
