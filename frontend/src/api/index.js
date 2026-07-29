@@ -119,6 +119,15 @@ export const getAllUsers = async () => {
     return handleResponse(response);
 };
 
+export const getPublicChat = async () => {
+    const response = await fetch(`${SERVER_DOMAIN}/chats/public`, {
+        method: 'GET',
+        credentials: 'include',
+    });
+
+    return handleResponse(response);
+};
+
 export const getChat = async (recipientId) => {
     const response = await fetch(`${SERVER_DOMAIN}/chats?recipientId=${recipientId}`, {
         method: 'GET',
