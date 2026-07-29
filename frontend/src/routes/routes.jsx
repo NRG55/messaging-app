@@ -2,10 +2,11 @@ import Layout from '../components/layout/Layout';
 import HomeView from '../components/views/home/HomeView';
 import Login from '../components/views/auth/Login';
 import Register from '../components/views/auth/Register';
-import NotFound from '../components/views/NotFound';
+import NotFound from '../components/views/error/NotFound';
 import MyProfile from '../components/views/MyProfile';
 import UserProfile from '../components/views/UserProfile';
-import Chat from '../components/views/Chat';
+import PrivateChat from '../components/views/PrivateChat';
+import PublicChat from '../components/views/PublicChat';
 
 const routes = [
     {
@@ -19,9 +20,9 @@ const routes = [
                 children: [                   
                     { 
                         index: true, 
-                        element: <h1>Column 3</h1>, 
+                        element: <PublicChat />, 
                     },
-                    { path: 'chat/:userId', element: <Chat /> },     
+                    { path: 'chat/:userId', element: <PrivateChat /> },     
                     { path: 'users/:userId', element: <UserProfile /> }, 
                 ],
             },
