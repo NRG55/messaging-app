@@ -2,7 +2,7 @@ import Layout from '../components/layout/Layout';
 import HomeView from '../components/views/home/HomeView';
 import Login from '../components/views/auth/Login';
 import Register from '../components/views/auth/Register';
-import NotFound from '../components/views/NotFound';
+import NotFound from '../components/views/error/NotFound';
 import MyProfile from '../components/views/MyProfile';
 import UserProfile from '../components/views/UserProfile';
 import Chat from '../components/views/Chat';
