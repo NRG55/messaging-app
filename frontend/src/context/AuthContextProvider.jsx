@@ -1,70 +1,42 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { api } from '../services/api';
 import AuthContext from './AuthContext.js';
-import { getMe, onSessionExpired } from '../api/index.js';
 
 export default function AuthContextProvider({ children }) {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
 
-    const login = (userData) => {
-        setUser(userData);
-        localStorage.setItem('userProfile', JSON.stringify(userData));
-    };
-
-    const logout = () => {
+    function logout() {
         setUser(null);
-        localStorage.removeItem('userProfile');
-    };
-
-    const updateUser = (userData) => {
-        setUser((prevUserData) => {
-            const updatedProfile = {
-                ...prevUserData,
-                ...userData,
-            };            
-            
-            localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
-            
-            return updatedProfile;
-        });
-    };
-
-    useEffect(() => {
-        onSessionExpired(logout);
-    }, []);
-
-    useEffect(() => {
-        const verifySession = async () => {
-            const userProfile = localStorage.getItem('userProfile');
-            
-            if (!userProfile) {
-                logout();
-                setLoading(false);
-                return;
-            }
-
-            try {
-                const me = await getMe();
-
-                login(me);
-
-            } catch {
-                logout();
-
-            } finally {
-                setLoading(false); 
-            }
-        };
-
-        verifySession();
-    }, []);
-
-    if (loading) {
-        return <div>Loading...</div>;
+        setIsAuthenticated(false);
     }
 
+    function login(userData) {
+        setUser(userData);
+        setIsAuthenticated(true);
+    }
+
+    useEffect(() => {
+        async function checkSession() {
+            try {
+                const data = await api('/users/me');
+
+                login(data.user);
+
+            } catch {                
+                logout();
+                
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        checkSession();
+    }, []);
+
     return (
-        <AuthContext.Provider value={{ user, login, logout, updateUser, loading }}>
+        <AuthContext.Provider value={{ isAuthenticated, isLoading, user, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
