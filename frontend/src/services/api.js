@@ -7,17 +7,17 @@ export const api = async (endpoint, options = {}) => {
             'Content-Type': 'application/json',
             ...options.headers,
         },       
-        credentials: 'include', 
+        credentials: 'include',
     };
 
-    const response = await fetch(`${BASE_URL}${endpoint}`, config);   
+    const response = await fetch(`${BASE_URL}${endpoint}`, config);
     
     if (!response.ok) {
         let errorData = null;
         let errorMessage = 'Something went wrong';
 
         try {        
-            errorData = await response.json(); 
+            errorData = await response.json();
         
             if (errorData && errorData.message) {
                 errorMessage = errorData.message;
@@ -27,9 +27,9 @@ export const api = async (endpoint, options = {}) => {
             errorData = { message: 'Something went wrong' };
         }
        
-        const error = new Error(errorMessage);    
+        const error = new Error(errorMessage);
        
-        error.responseData = errorData; 
+        error.responseData = errorData;
         error.status = response.status;
 
         throw error;
