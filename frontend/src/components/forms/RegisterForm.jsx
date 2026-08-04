@@ -1,30 +1,50 @@
-import { Link, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import useAuth from '../../hooks/useAuth';
-import useForm from '../../hooks/useForm';
-import { registerUser } from '../../api';
 import Input from '../Input';
 import PasswordInput from '../PasswordInput';
+import { useState } from 'react';
 
 export default function RegisterForm() {
     const navigate = useNavigate();
     const { login } = useAuth();
-    const { submitForm, isSubmitting, errors } = useForm(registerUser);
 
-    const handleSubmit = async (e) => {
-        const data = await submitForm(e);
-        
-        if (data) {
-            login(data.user);
-            navigate('/dashboard');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errors, setErrors] = useState([]);
+
+    async function handleSubmit(event) {
+        event.preventDefault();
+
+        setErrors([]);
+        setIsSubmitting(true);        
+       
+        const formData = new FormData(event.currentTarget);
+        const payload = Object.fromEntries(formData.entries());
+
+        try {           
+            const response = await api('/auth/register', {
+                method: 'POST',
+                body: JSON.stringify(payload),
+            });
+            
+            if (response && response.success) {
+                login(response.user);
+                navigate('/', { replace: true });
+            }
+
+        } catch (error) {           
+            if (error.responseData && error.responseData.errors) {                
+                setErrors(error.responseData.errors);
+
+            } else {                
+                setErrors([{ msg: error.message || 'An unexpected error occurred.' }]);
+            }
+        } finally {           
+            setIsSubmitting(false);
         }
-    };
+    }
 
     return (
         <form onSubmit={handleSubmit} className="w-[80%] max-w-100">
-            <h1 className="text-3xl text-center mb-18">
-                Create Account
-            </h1>
-
             {errors && errors.map((error, i) => (
                 <p key={'error-' + i} className="mb-4 text-red-400">
                     {error.msg}
@@ -60,26 +80,6 @@ export default function RegisterForm() {
             >
                 {isSubmitting ? 'Creating Account...' : 'Sign up'}
             </button>
-
-            <p className="mt-15 text-gray-400 text-center">
-                Already have an account?
-                <Link to="/login" className="underline text-black ml-2">
-                    Log in
-                </Link>
-            </p>
-
-            <div className="relative w-full flex items-center gap-2 my-6 opacity-10 text-black font-bold">
-                <hr className="w-1/2 border-black" />
-                <p>OR</p>
-                <hr className="w-1/2 border-black" />
-            </div>
-
-            <p className="text-gray-400 text-center">
-                Back to
-                <Link to="/" className="underline text-black ml-2">
-                    Homepage
-                </Link>
-            </p>
         </form>
     );
 }
