@@ -35,7 +35,7 @@ export default function errorHandler(err, req, res, _next) {
 
         case 'CHAT_ACCESS_DENIED':
             statusCode = 403; // Forbidden
-            clientMessage = 'Access denied. Not a chat participant.';
+            clientMessage = 'Access denied. You are not a member of this chat.';
             break;
 
         default:
