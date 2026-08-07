@@ -2,9 +2,9 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import authRouter from './routes/auth.js';
-import userRouter from './routes/user.js';
-import chatRouter from './routes/chat.js';
+import authRoutes from './routes/auth.routes.js';
+import userRoutes from './routes/user.routes.js';
+import chatRoutes from './routes/chat.routes.js';
 import errorHandler from './middleware/errorHandler.js';
 
 const app = express();
@@ -22,9 +22,9 @@ app.get('/', (req, res) => {
     res.send('Messaging app server is running!');
 });
 
-app.use('/auth', authRouter);
-app.use('/users', userRouter);
-app.use('/chats', chatRouter);
+app.use('/auth', authRoutes);
+app.use('/users', userRoutes);
+app.use('/chats', chatRoutes);
 
 app.use(errorHandler);
 
