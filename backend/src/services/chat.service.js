@@ -31,4 +31,27 @@ export const ChatService = {
             },
         });
     },
+
+    async createGroupChat(creatorId, chatName, chatMembersIds) {
+        const uniqueChatMemberIds = Array.from(new Set([creatorId, ...chatMembersIds]));
+
+        const members = uniqueChatMemberIds.map((userId) => ({ userId }));
+
+        return await prisma.chat.create({
+            data: {
+                type: 'GROUP',
+                name: chatName,
+                members: {
+                    create: members,
+                },
+            },
+            include: {
+                members: {
+                    include: {
+                        user: { select: { id: true, username: true, avatarUrl: true } },
+                    },
+                },
+            },
+        });
+    },
 };
