@@ -1,15 +1,5 @@
-import { body, validationResult } from 'express-validator';
-
-const handleValidationErrors = (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ 
-            success: false,
-            errors: errors.array(), 
-        });
-    }
-    next();
-};
+import { body } from 'express-validator';
+import { handleValidationErrors } from '../../utils/validation.utils.js';
 
 export const AuthValidator = {
     login: [
@@ -52,46 +42,6 @@ export const AuthValidator = {
                 return true;
             }),
 
-        handleValidationErrors,
-    ],
-};
-
-export const MessageValidator = {
-    sendMessage: [
-        body('text')
-            .trim()
-            .notEmpty().withMessage('Message cannot be empty.'),
-            
-        handleValidationErrors,
-    ],
-};
-
-export const ChatValidator = {
-    createDirectChat: [
-        body('recipientId')
-            .trim()
-            .notEmpty().withMessage('Recipient ID is required.')
-            .bail()
-            .isUUID().withMessage('Invalid Recipient ID format.'),
-       
-        body('recipientId').custom((recipientId, { req }) => {
-            if (req.user?.id === recipientId) {
-                throw new Error('Sender and recipient IDs cannot be identical.');
-            }
-            return true;
-        }),
-
-        handleValidationErrors,
-    ],
-
-    createGroupChat: [
-        body('chatName')
-            .trim()
-            .notEmpty().withMessage('Group chat name is required.'),
-            
-        body('chatMembersIds')
-            .isArray({ min: 1 }).withMessage('At least one participant ID must be provided.'),
-            
         handleValidationErrors,
     ],
 };
