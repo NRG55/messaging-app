@@ -12,41 +12,49 @@ model User {
     username     String    @unique
     password     String
     avatarUrl    String?
-    bio          String?   @db.VarChar(160)
+    bio          String?
     createdAt    DateTime  @default(now())
 
     messages     Message[]
-    chats        ChatParticipant[] // ChatParticipant[] instead of Chat[] because User connects to ChatParticipant join table
+    memberships  ChatMember[]
+}
+
+model Chat {
+    id           String   @id @default(uuid())
+    type         ChatType
+    name         String?
+    createdAt    DateTime @default(now())
+
+    members      ChatMember[]
+    messages     Message[]
+}
+
+enum ChatType {
+    DIRECT
+    GROUP
+    PUBLIC
+}
+
+model ChatMember {
+    id           String   @id @default(uuid())
+    userId       String
+    chatId       String
+    createdAt    DateTime @default(now())
+
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    chat         Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, chatId])
 }
 
 model Message {
     id           String   @id @default(uuid())
-    text         String
-    createdAt    DateTime @default(now())
-
-    senderId     String
-    sender       User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
-
-    chatId       String    
-    chat         Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
-    }
-
-model Chat {
-    id           String   @id @default(uuid())
-    createdAt    DateTime @default(now())
-
-    participants ChatParticipant[]
-    messages     Message[]
-}
-
-model ChatParticipant {
-    id           String   @id @default(uuid())
-
-    userId       String
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
     chatId       String
-    chat         Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+    senderId     String
+    text         String
+    imageUrl     String?
+    createdAt    DateTime @default(now())
 
-    @@unique([userId, chatId])
+    sender       User     @relation(fields: [senderId], references: [id], onDelete: Cascade)    
+    chat         Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
 }

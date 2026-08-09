@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import jwt from 'jsonwebtoken';
 
-const generateToken = (userId, username) => {
+export const generateToken = (userId, username) => {
     if (!process.env.JWT_SECRET) {
         throw new Error('JWT_SECRET is not defined');       
     }
@@ -19,5 +19,3 @@ const generateToken = (userId, username) => {
         { expiresIn: process.env.JWT_ACCESS_EXPIRATION },
     );
 };
-
-export default generateToken;
