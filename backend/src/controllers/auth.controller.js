@@ -1,22 +1,19 @@
 import { AuthService } from '../services/auth.service.js';
+import { CookieUtil } from '../utils/cookie.utils.js';
 
 export const AuthController = {
     async register(req, res, next) {
         try {
-            const data = await AuthService.register(req.body);
+            const { token, user } = await AuthService.register(req.body);
             
-            res.cookie('token', data.token, {
-                httpOnly: true,
-                secure: true,
-                sameSite: 'strict',
-                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-            });        
+            CookieUtil.setAuthCookie(res, token);        
             
             return res.status(201).json({
                 success: true,
                 message: 'Registration and login successful!',
-                user: data.user,
+                user,
             });
+
         } catch (error) {
             next(error);
         }
@@ -24,20 +21,16 @@ export const AuthController = {
 
     async login(req, res, next) {
         try {
-            const data = await AuthService.login(req.body);
+            const { token, user } = await AuthService.login(req.body);
 
-            res.cookie('token', data.token, {
-                httpOnly: true,
-                secure: true,
-                sameSite: 'strict',
-                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-            });
+            CookieUtil.setAuthCookie(res, token);
             
             return res.status(200).json({
                 success: true,
                 message: 'Login successful',
-                user: data.user,
+                user,
             });
+
         } catch (error) {
             next(error);
         }
@@ -45,16 +38,13 @@ export const AuthController = {
 
     async logout(req, res, next) {
         try {
-            res.clearCookie('token', {
-                httpOnly: true,
-                secure: true,
-                sameSite: 'strict',
-            });
+            CookieUtil.clearAuthCookie(res);
 
             return res.status(200).json({
                 success: true,
                 message: 'Logged out successfully.',
             });
+            
         } catch (error) {
             next(error);
         }
