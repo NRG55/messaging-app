@@ -54,4 +54,70 @@ export const ChatService = {
             },
         });
     },
+
+    async getUserChats(userId) {
+        const chats = await prisma.chat.findMany({
+            where: {
+                members: {
+                    some: { userId },
+                },
+            },
+            include: {
+                members: {
+                    include: {
+                        user: {
+                            select: { id: true, username: true, avatarUrl: true },
+                        },
+                    },
+                },
+                messages: {
+                    orderBy: { createdAt: 'desc' },
+                    take: 1,
+                    include: {
+                        sender: { select: { username: true } },
+                    },
+                },
+            },
+        });
+
+        const formattedChats = chats.map(chat => formatChat(chat, userId));
+        const sortedByLatestActivityChats = formattedChats.sort((a, b) => b.lastActivity - a.lastActivity);
+
+        console.dir(sortedByLatestActivityChats, { depth: null });
+
+        return sortedByLatestActivityChats;
+    },
 };
+
+function formatChat(chat, currentUserId) {
+    const latestMessage = chat.messages?.[0] || null;
+
+    const lastActivity = latestMessage ? new Date(latestMessage.createdAt) : new Date(chat.createdAt);
+    const formattedLatestMessage = latestMessage ? {
+        id: latestMessage.id,
+        text: latestMessage.text,
+        senderName: latestMessage.sender.username,
+        createdAt: latestMessage.createdAt,
+    } : null;
+
+    let chatName = chat.name;
+    let avatarUrl = null;
+
+    if (chat.type === 'DIRECT') {
+        const otherMember = chat.members.find(member => member.userId !== currentUserId);
+
+        if (otherMember?.user) {
+            chatName = otherMember.user.username;
+            avatarUrl = otherMember.user.avatarUrl;
+        }
+    }
+
+    return {
+        id: chat.id,
+        type: chat.type,
+        name: chatName,
+        avatarUrl,
+        latestMessage: formattedLatestMessage,
+        lastActivity,
+    };
+}
