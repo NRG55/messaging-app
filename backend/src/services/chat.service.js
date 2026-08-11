@@ -1,5 +1,15 @@
 import prisma from '../config/prisma.js';
 
+const BASE_CHAT_INCLUDE = {
+    members: {
+        include: {
+            user: {
+                select: { id: true, username: true, avatarUrl: true },
+            },
+        },
+    },
+};
+
 export const ChatService = {
     async getOrCreateDirectChat(userId1, userId2) {
         const existingChat = await prisma.chat.findFirst({
@@ -10,6 +20,7 @@ export const ChatService = {
                     { members: { some: { userId: userId2 } } },
                 ],
             },
+            include: BASE_CHAT_INCLUDE,
         });
 
         if (existingChat) {
@@ -20,15 +31,10 @@ export const ChatService = {
             data: {
                 type: 'DIRECT',
                 members: {
-                    create: [
-                        { userId: userId1 },
-                        { userId: userId2 },
-                    ],
+                    create: [{ userId: userId1 }, { userId: userId2 }],
                 },
             },
-            include: {
-                members: true,
-            },
+            include: BASE_CHAT_INCLUDE,
         });
     },
 
@@ -45,13 +51,7 @@ export const ChatService = {
                     create: members,
                 },
             },
-            include: {
-                members: {
-                    include: {
-                        user: { select: { id: true, username: true, avatarUrl: true } },
-                    },
-                },
-            },
+            include: BASE_CHAT_INCLUDE,
         });
     },
 
@@ -63,13 +63,7 @@ export const ChatService = {
                 },
             },
             include: {
-                members: {
-                    include: {
-                        user: {
-                            select: { id: true, username: true, avatarUrl: true },
-                        },
-                    },
-                },
+                ...BASE_CHAT_INCLUDE,
                 messages: {
                     orderBy: { createdAt: 'desc' },
                     take: 1,
@@ -82,8 +76,6 @@ export const ChatService = {
 
         const formattedChats = chats.map(chat => formatChat(chat, userId));
         const sortedByLatestActivityChats = formattedChats.sort((a, b) => b.lastActivity - a.lastActivity);
-
-        console.dir(sortedByLatestActivityChats, { depth: null });
 
         return sortedByLatestActivityChats;
     },

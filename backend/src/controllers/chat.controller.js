@@ -6,9 +6,12 @@ export const ChatController = {
             const senderId = req.user.id;            
             const { recipientId } = req.body;
 
-            const chat = await ChatService.getOrCreateDirectChat(senderId, recipientId);
+            const directChat = await ChatService.getOrCreateDirectChat(senderId, recipientId);
 
-            return res.status(200).json(chat);
+            return res.status(200).json({
+                success: true,
+                data: directChat,
+            });
 
         } catch (error) {
             next(error);
@@ -22,7 +25,26 @@ export const ChatController = {
 
             const groupChat = await ChatService.createGroupChat(creatorId, chatName, chatMembersIds);
 
-            return res.status(201).json(groupChat);
+            return res.status(201).json({
+                success: true,
+                data: groupChat,
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async getUserChats(req, res, next) {
+        try {
+            const userId = req.user.id;
+
+            const userChats = await ChatService.getUserChats(userId);
+
+            return res.status(200).json({
+                success: true,
+                data: userChats,
+            });
 
         } catch (error) {
             next(error);

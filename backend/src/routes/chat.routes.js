@@ -7,6 +7,8 @@ import { MessageController } from '../controllers/message.controller.js';
 
 const router = Router();
 
+router.get('/', verifyToken, ChatController.getUserChats);
+
 router.post('/direct', verifyToken, ChatValidator.createDirectChat, ChatController.createDirectChat);
 router.post('/group', verifyToken, ChatValidator.createGroupChat, ChatController.createGroupChat);
 
