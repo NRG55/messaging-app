@@ -56,6 +56,25 @@ export const ChatService = {
         return normalizeChat(chat, creatorId);
     },
 
+    async getChatById(chatId, userId) {
+        const chat = await prisma.chat.findUnique({
+            where: { id: chatId },
+            include: BASE_CHAT_INCLUDE,
+        });
+
+        if (!chat) {
+            throw new Error('CHAT_NOT_FOUND');
+        }
+
+        const isMember = chat.members.some(member => member.userId === userId);
+
+        if (!isMember) {
+            throw new Error('CHAT_ACCESS_DENIED');
+        }
+
+        return normalizeChat(chat, userId);
+    },
+
     async getUserChats(userId) {
         const chats = await prisma.chat.findMany({
             where: {

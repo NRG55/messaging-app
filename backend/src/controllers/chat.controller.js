@@ -35,6 +35,23 @@ export const ChatController = {
         }
     },
 
+    async getChat(req, res, next) {
+        try {
+            const { chatId } = req.params;
+            const userId = req.user.id;
+
+            const chat = await ChatService.getChatById(chatId, userId);
+
+            return res.status(200).json({
+                success: true,
+                data: chat,
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    },
+
     async getUserChats(req, res, next) {
         try {
             const userId = req.user.id;

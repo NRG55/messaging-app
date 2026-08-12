@@ -33,6 +33,11 @@ export default function errorHandler(err, req, res, _next) {
             clientMessage = 'Bio cannot be longer than 160 characters.';
             break;
 
+        case 'CHAT_NOT_FOUND':
+            statusCode = 404; 
+            clientMessage = 'The requested chat does not exist.';
+            break;
+
         case 'CHAT_ACCESS_DENIED':
             statusCode = 403; // Forbidden
             clientMessage = 'Access denied. You are not a member of this chat.';

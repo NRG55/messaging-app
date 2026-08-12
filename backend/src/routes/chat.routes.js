@@ -12,6 +12,8 @@ router.get('/', verifyToken, ChatController.getUserChats);
 router.post('/direct', verifyToken, ChatValidator.createDirectChat, ChatController.createDirectChat);
 router.post('/group', verifyToken, ChatValidator.createGroupChat, ChatController.createGroupChat);
 
+router.get('/:chatId', verifyToken, ChatController.getChat);
+
 router.post('/:chatId/messages', verifyToken, MessageValidator.sendMessage, MessageController.sendMessage);
 router.get('/:chatId/messages', verifyToken, MessageController.getMessages);
 
