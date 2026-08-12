@@ -3,10 +3,10 @@ import { ChatService } from '../services/chat.service.js';
 export const ChatController = {
     async createDirectChat(req, res, next) {
         try {
-            const senderId = req.user.id;            
-            const { recipientId } = req.body;
+            const currentUserId = req.user.id;            
+            const { targetUserId } = req.body;
 
-            const directChat = await ChatService.getOrCreateDirectChat(senderId, recipientId);
+            const directChat = await ChatService.getOrCreateDirectChat(currentUserId, targetUserId);
 
             return res.status(200).json({
                 success: true,

@@ -11,39 +11,38 @@ const BASE_CHAT_INCLUDE = {
 };
 
 export const ChatService = {
-    async getOrCreateDirectChat(userId1, userId2) {
-        const existingChat = await prisma.chat.findFirst({
+    async getOrCreateDirectChat(currentUserId, targetUserId) {
+        let chat = await prisma.chat.findFirst({
             where: {
                 type: 'DIRECT',
                 AND: [
-                    { members: { some: { userId: userId1 } } },
-                    { members: { some: { userId: userId2 } } },
+                    { members: { some: { userId: currentUserId } } },
+                    { members: { some: { userId: targetUserId } } },
                 ],
             },
             include: BASE_CHAT_INCLUDE,
         });
 
-        if (existingChat) {
-            return existingChat;
+        if (!chat) {
+            chat = await prisma.chat.create({
+                data: {
+                    type: 'DIRECT',
+                    members: {
+                        create: [{ userId: currentUserId }, { userId: targetUserId }],
+                    },
+                },
+                include: BASE_CHAT_INCLUDE,
+            });
         }
 
-        return await prisma.chat.create({
-            data: {
-                type: 'DIRECT',
-                members: {
-                    create: [{ userId: userId1 }, { userId: userId2 }],
-                },
-            },
-            include: BASE_CHAT_INCLUDE,
-        });
+        return normalizeChat(chat, currentUserId); 
     },
 
     async createGroupChat(creatorId, chatName, chatMembersIds) {
         const uniqueChatMemberIds = Array.from(new Set([creatorId, ...chatMembersIds]));
-
         const members = uniqueChatMemberIds.map((userId) => ({ userId }));
 
-        return await prisma.chat.create({
+        const chat = await prisma.chat.create({
             data: {
                 type: 'GROUP',
                 name: chatName,
@@ -53,6 +52,8 @@ export const ChatService = {
             },
             include: BASE_CHAT_INCLUDE,
         });
+
+        return normalizeChat(chat, creatorId);
     },
 
     async getUserChats(userId) {
@@ -74,29 +75,37 @@ export const ChatService = {
             },
         });
 
-        const formattedChats = chats.map(chat => formatChat(chat, userId));
-        const sortedByLatestActivityChats = formattedChats.sort((a, b) => b.lastActivity - a.lastActivity);
+        const normalizedChats = chats.map(chat => {
+            const normalizedChat = normalizeChat(chat, userId);
+            const rawLatestMessage = chat.messages?.[0] || null;
 
-        return sortedByLatestActivityChats;
+            const latestMessage = rawLatestMessage ? {
+                id: rawLatestMessage.id,
+                text: rawLatestMessage.text,
+                senderName: rawLatestMessage.sender.username,
+                createdAt: rawLatestMessage.createdAt,
+            } : null;
+
+            const lastActivity = rawLatestMessage ? new Date(rawLatestMessage.createdAt) : new Date(chat.createdAt);
+
+            return {
+                ...normalizedChat,
+                latestMessage,
+                lastActivity,
+            };
+
+        });        
+
+        return normalizedChats.sort((a, b) => b.lastActivity - a.lastActivity);
     },
 };
 
-function formatChat(chat, currentUserId) {
-    const latestMessage = chat.messages?.[0] || null;
-
-    const lastActivity = latestMessage ? new Date(latestMessage.createdAt) : new Date(chat.createdAt);
-    const formattedLatestMessage = latestMessage ? {
-        id: latestMessage.id,
-        text: latestMessage.text,
-        senderName: latestMessage.sender.username,
-        createdAt: latestMessage.createdAt,
-    } : null;
-
+function normalizeChat(chat, currentUserId) {
     let chatName = chat.name;
-    let avatarUrl = null;
+    let avatarUrl = chat.avatarUrl || null;
 
     if (chat.type === 'DIRECT') {
-        const otherMember = chat.members.find(member => member.userId !== currentUserId);
+        const otherMember = chat.members?.find(member => member.userId !== currentUserId);
 
         if (otherMember?.user) {
             chatName = otherMember.user.username;
@@ -109,7 +118,6 @@ function formatChat(chat, currentUserId) {
         type: chat.type,
         name: chatName,
         avatarUrl,
-        latestMessage: formattedLatestMessage,
-        lastActivity,
+        createdAt: chat.createdAt,
     };
 }
