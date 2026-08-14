@@ -1,5 +1,5 @@
-import prisma from '../config/prisma.js';
-import cloudinary from '../config/cloudinary.js';
+import prisma from '../../config/prisma.js';
+import cloudinary from '../../config/cloudinary.js';
 
 export const getUserProfile = async (userId) => {
     const userProfile = await prisma.user.findUnique({

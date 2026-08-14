@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import verifyToken from '../middleware/verifyToken.js';
-import { ChatValidator } from '../middleware/validators/chat.validator.js';
-import { ChatController } from '../controllers/chat.controller.js';
-import { MessageValidator } from '../middleware/validators/message.validator.js';
-import { MessageController } from '../controllers/message.controller.js';
+import verifyToken from '../../middleware/verifyToken.js';
+import { ChatValidator } from './chat.validator.js';
+import { ChatController } from './chat.controller.js';
+import { MessageValidator } from '../message/message.validator.js';
+import { MessageController } from '../message/message.controller.js';
 
 const router = Router();
 

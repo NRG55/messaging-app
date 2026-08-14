@@ -1,8 +1,14 @@
-export default function errorHandler(err, req, res, _next) {    
-    let statusCode = 500;
+export default function errorHandler(err, req, res, _next) {
+    let statusCode = err.statusCode || 500;
     let clientMessage = 'Internal server error. Please try again later.';
+    let errors = err.errors || null;
     
     switch (err.message) {
+        case 'VALIDATION_FAILED':
+            statusCode = 400;
+            clientMessage = 'Please correct the validation errors.';
+            break;
+
         case 'USERNAME_TAKEN':
             statusCode = 400; // Bad Request
             clientMessage = 'Username already exists. Please try another one!';
@@ -49,6 +55,7 @@ export default function errorHandler(err, req, res, _next) {
     
     return res.status(statusCode).json({
         success: false,
-        errors: [{ msg: clientMessage }],
+        message: clientMessage,
+        errors,
     });
 }

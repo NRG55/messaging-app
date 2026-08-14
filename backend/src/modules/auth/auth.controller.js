@@ -1,5 +1,5 @@
-import { AuthService } from '../services/auth.service.js';
-import { CookieUtil } from '../utils/cookie.utils.js';
+import { AuthService } from './auth.service.js';
+import { CookieUtil } from '../../utils/cookie.utils.js';
 
 export const AuthController = {
     async register(req, res, next) {
@@ -11,7 +11,7 @@ export const AuthController = {
             return res.status(201).json({
                 success: true,
                 message: 'Registration and login successful!',
-                user,
+                data: { user },
             });
 
         } catch (error) {
@@ -28,7 +28,7 @@ export const AuthController = {
             return res.status(200).json({
                 success: true,
                 message: 'Login successful',
-                user,
+                data: { user },
             });
 
         } catch (error) {
@@ -44,7 +44,7 @@ export const AuthController = {
                 success: true,
                 message: 'Logged out successfully.',
             });
-            
+
         } catch (error) {
             next(error);
         }

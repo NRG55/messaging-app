@@ -1,4 +1,4 @@
-import { ChatService } from '../services/chat.service.js';
+import { ChatService } from './chat.service.js';
 
 export const ChatController = {
     async createDirectChat(req, res, next) {

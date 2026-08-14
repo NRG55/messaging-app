@@ -2,10 +2,11 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import authRoutes from './routes/auth.routes.js';
-import userRoutes from './routes/user.routes.js';
-import chatRoutes from './routes/chat.routes.js';
 import errorHandler from './middleware/errorHandler.js';
+
+import authRoutes from './modules/auth/auth.routes.js';
+import userRoutes from './modules/user/user.routes.js';
+import chatRoutes from './modules/chat/chat.routes.js';
 
 const app = express();
 
