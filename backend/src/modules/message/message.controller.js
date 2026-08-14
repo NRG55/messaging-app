@@ -1,4 +1,4 @@
-import { MessageService } from '../services/message.service.js';
+import { MessageService } from './message.service.js';
 
 export const MessageController = {
     async sendMessage(req, res, next) {

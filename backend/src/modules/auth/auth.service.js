@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
-import prisma from '../config/prisma.js';
-import { generateToken } from '../utils/token.utils.js';
+import prisma from '../../config/prisma.js';
+import { generateToken } from '../../utils/token.utils.js';
 
 export const AuthService = {
     async register({ username, password }) {

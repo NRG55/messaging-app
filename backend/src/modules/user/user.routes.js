@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { getMe, updateProfile, getProfile, getAllUsers } from '../controllers/user.js';
-import verifyToken from '../middleware/verifyToken.js';
+import { getMe, updateProfile, getProfile, getAllUsers } from './user.controller.js';
+import verifyToken from '../../middleware/verifyToken.js';
 
 const router = Router();
 
