@@ -1,5 +1,5 @@
 import { createBrowserRouter, RouterProvider } from 'react-router';
-import useAuth from './hooks/useAuth';
+import { useAuth } from './features/auth/hooks';
 import routes from './routes';
 
 export default function App() {
