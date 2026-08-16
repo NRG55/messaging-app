@@ -16,8 +16,8 @@ export const fetchUserChats = () => api('/chats');
 
 export const fetchChatMessages = (chatId) => api(`/chats/${chatId}/messages`);
 
-export const sendChatMessage = ({ chatId, messageData }) =>
+export const sendChatMessage = ({ chatId, text }) =>
     api(`/chats/${chatId}/messages`, {
         method: 'POST',
-        body: JSON.stringify(messageData),
+        body: JSON.stringify({ text }),
     });
