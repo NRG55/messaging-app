@@ -1,5 +1,5 @@
 import { Outlet, useParams } from 'react-router';
-import ChatSidebar from '../components/ChatSidebar';
+import ChatSidebar from '../ChatSidebar2';
 
 export default function MainLayout() {
     const { chatId } = useParams();
