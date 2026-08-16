@@ -1,3 +1,14 @@
+class ApiError extends Error {
+    constructor(message, status, responseData) {
+        super(message);
+        this.name = 'ApiError';
+        this.status = status;
+        this.responseData = responseData;
+
+        Object.setPrototypeOf(this, ApiError.prototype);
+    }
+}
+
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export const api = async (endpoint, options = {}) => {
@@ -16,24 +27,25 @@ export const api = async (endpoint, options = {}) => {
         let errorData = null;
         let errorMessage = 'Something went wrong';
 
-        try {        
+        try {
             errorData = await response.json();
-        
+
             if (errorData && errorData.message) {
                 errorMessage = errorData.message;
             }
 
-        } catch {        
+        } catch {
             errorData = { message: 'Something went wrong' };
         }
        
-        const error = new Error(errorMessage);
-       
-        error.responseData = errorData;
-        error.status = response.status;
-
-        throw error;
+        throw new ApiError(errorMessage, response.status, errorData);
     }
 
-    return response.status === 204 ? null : response.json();
+    if (response.status === 204) {
+        return null;
+    }
+
+    const result = await response.json();
+
+    return result.hasOwnProperty('data') ? result.data : result;
 };

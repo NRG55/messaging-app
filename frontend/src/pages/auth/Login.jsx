@@ -1,10 +1,10 @@
 import { Link } from 'react-router';
-import LoginForm from '../../components/forms/LoginForm';
+import LoginForm from '../../features/auth/components/forms/LoginForm';
 
 export default function Login() {
     return (
         <div className="w-[80%] max-w-100 flex flex-col items-center">            
-            <h1 className="text-3xl text-center font-bold mb-8">
+            <h1 className="text-3xl text-center font-bold mb-6">
                 Welcome Back
             </h1>
            

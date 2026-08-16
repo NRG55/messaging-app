@@ -4,7 +4,7 @@ export default function PasswordInput({ name = 'password', value, placeholder = 
     const [passwordVisible, setPasswordVisible] = useState(false);
 
     return (
-        <label className="relative block w-full mb-4">
+        <label className="relative block w-full">
             <span className="sr-only">{placeholder}</span>
 
             <input

@@ -1,6 +1,6 @@
 export default function Input({ type = 'text', name, value, placeholder, className = '', ...rest }) {
     return (
-        <label className="relative block w-full mb-4">
+        <label className="relative block w-full">
             <span className="sr-only">{placeholder}</span>
 
             <input

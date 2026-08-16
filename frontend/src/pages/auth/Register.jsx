@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import RegisterForm from '../../components/forms/RegisterForm';
+import RegisterForm from '../../features/auth/components/forms/RegisterForm';
 
 export default function Register() {
     return (
