@@ -1,4 +1,4 @@
-import ChatItem from './ConversationItem';
+import ConversationItem from './ConversationItem';
 
 export default function ConversationList({ chats }) {
     if (chats.length === 0) {
@@ -12,7 +12,7 @@ export default function ConversationList({ chats }) {
     return (
         <div className="flex-1 overflow-y-auto">
             {chats.map((chat) => (
-                <ChatItem key={chat.id} chat={chat} />
+                <ConversationItem key={chat.id} chat={chat} />
             ))}
         </div>
     );
