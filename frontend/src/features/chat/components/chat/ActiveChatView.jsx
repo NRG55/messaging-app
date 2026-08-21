@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { Send } from 'lucide-react';
-import { useAuth } from '../../auth/hooks';
-import { useChatMessages, useSendMessageMutation } from '../hooks';
+import { useAuth } from '../../../auth/hooks';
+import { useActiveChatDetails, useChatMessages, useSendMessageMutation } from '../../hooks';
 
 export default function ActiveChatView() {
     const { chatId } = useParams();   
@@ -10,8 +10,8 @@ export default function ActiveChatView() {
     const messagesEndRef = useRef(null);
     
     const { user, isLoading: isAuthLoading } = useAuth();
-    const { data: messages = [], isLoading: isMessagesLoading, isError } = useChatMessages(chatId);
-
+    const { chat, isLoading: isChatLoading, isError: isChatError } = useActiveChatDetails(chatId);
+    const { data: messages = [], isLoading: isMessagesLoading, isError: isMessagesError } = useChatMessages(chatId);
     const { mutate, isPending } = useSendMessageMutation(chatId);
     
     useEffect(() => {
@@ -35,24 +35,32 @@ export default function ActiveChatView() {
         });
     }
 
-    if (isAuthLoading || isMessagesLoading) {
+    if (isAuthLoading || isChatLoading || isMessagesLoading) {
         return <div> Loading... </div>;
     }
 
-    if (isError) {
-        return  <div> Failed to fetch messages </div>;
+    if (isChatError || isMessagesError || !chat) {
+        return  <div> Failed to display chat </div>;
     }
+
+    const isGroup = chat.type === 'GROUP';   
+    const memberCount = chat.members?.length || 0;
+
+    const chatTitle = chat.name;
+    const chatSubtitle = isGroup
+        ? `${memberCount} ${memberCount === 1 ? 'member' : 'members'}`
+        : 'Last activity placeholder...';
 
     return (
         <div className="flex-1 flex flex-col h-full bg-gray-50 overflow-hidden">
             <div className="h-14 flex items-center shrink-0 px-4 bg-white border-b border-gray-200">
                 <div className="min-w-0">
-                    <h3 className="font-semibold text-sm text-gray-800 truncate">
-                        Chat name
+                    <h3 className="font-semibold text-sm text-gray-800 capitalize truncate">
+                        {chatTitle}
                     </h3>
 
                     <p className="mt-0.5 text-[10px] text-gray-400">
-                        last seen ...
+                        {chatSubtitle}
                     </p>
                 </div>
             </div>
@@ -65,6 +73,7 @@ export default function ActiveChatView() {
                 ) : (
                     messages.map((message) => {
                         const isMe = message.sender.id === user?.id;
+                        const showSenderName = isGroup && !isMe;
                         const messageBubbleClasses = isMe 
                             ? 'self-end bg-gray-200 border rounded-2xl rounded-br-none border-gray-300'
                             : 'self-start bg-white border rounded-2xl rounded-bl-none border-gray-100';
@@ -74,6 +83,12 @@ export default function ActiveChatView() {
                                 key={message.id} 
                                 className={`flex flex-col max-w-[70%] p-3 shadow-xs ${messageBubbleClasses}`}
                             >
+                                {showSenderName && (
+                                    <span className="mb-0.5 text-[11px] capitalize text-blue-500 tracking-wide">
+                                        {message.sender.username}
+                                    </span>
+                                )}
+
                                 <p className="mt-0.5 text-sm text-gray-800 whitespace-pre-wrap wrap-break-words leading-relaxed">
                                     {message.text}
                                 </p>

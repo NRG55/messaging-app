@@ -1,4 +1,4 @@
-import { useUserChats } from '../hooks';
+import { useUserChats } from '../../hooks';
 import ConversationList from './ConversationList';
 
 export default function ChatSidebar() {

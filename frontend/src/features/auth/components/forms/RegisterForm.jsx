@@ -3,22 +3,21 @@ import Input from './Input';
 import PasswordInput from './PasswordInput';
 
 export default function RegisterForm() {
-    const registerMutation = useRegisterMutation();    
+    const { mutate, isPending, isError, error } = useRegisterMutation();    
 
-    async function handleSubmit(event) {
+    function handleSubmit(event) {
         event.preventDefault();
         
         const formData = Object.fromEntries(new FormData(event.currentTarget));
 
-        registerMutation.mutate(formData);
+        mutate(formData);
     }
-
-    const isErrorState = registerMutation.isError;
-    const fieldErrors = isErrorState ? (registerMutation.error?.responseData?.errors || {}) : {};    
+    
+    const fieldErrors = isError ? (error?.responseData?.errors || {}) : {};    
     const hasFieldErrors = Object.keys(fieldErrors).length > 0;
 
-    const globalErrorMessage = (isErrorState && !hasFieldErrors) ? registerMutation.error?.message : '';
-    const showGlobalErrorMessage = isErrorState && !hasFieldErrors && !!globalErrorMessage;
+    const globalErrorMessage = (isError && !hasFieldErrors) ? error?.message : '';
+    const showGlobalErrorMessage = isError && !hasFieldErrors && !!globalErrorMessage;
 
     return (
         <form onSubmit={handleSubmit} className="w-[80%] max-w-100">
@@ -32,7 +31,7 @@ export default function RegisterForm() {
                     name="username"
                     placeholder="Username"
                     required
-                    disabled={registerMutation.isPending}
+                    disabled={isPending}
                 />
 
                 <span className={`text-xs text-red-500 pl-1 min-h-4 transition-opacity duration-150 ${fieldErrors.username ? 'visible opacity-100' : 'invisible opacity-0'}`}>
@@ -44,7 +43,7 @@ export default function RegisterForm() {
                     name="password"
                     placeholder="Password"
                     required
-                    disabled={registerMutation.isPending}
+                    disabled={isPending}
                 />
 
                 <span className={`text-xs text-red-500 pl-1 min-h-4 transition-opacity duration-150 ${fieldErrors.password ? 'visible opacity-100' : 'invisible opacity-0'}`}>
@@ -57,7 +56,7 @@ export default function RegisterForm() {
                     name="passwordConfirmation"
                     placeholder="Confirm password"
                     required
-                    disabled={registerMutation.isPending}
+                    disabled={isPending}
                 />
 
                 <span className={`text-xs text-red-500 pl-1 min-h-4 transition-opacity duration-150 ${fieldErrors.passwordConfirmation ? 'visible opacity-100' : 'invisible opacity-0'}`}>
@@ -67,10 +66,10 @@ export default function RegisterForm() {
 
             <button
                 type="submit"
-                disabled={registerMutation.isPending}
+                disabled={isPending}
                 className="cursor-pointer w-full bg-black text-white rounded-xs py-2 px-6 mt-6 hover:bg-gray-700 transition-colors"                
             >
-                {registerMutation.isPending ? 'Creating Account...' : 'Sign up'}
+                {isPending ? 'Creating Account...' : 'Sign up'}
             </button>
         </form>
     );

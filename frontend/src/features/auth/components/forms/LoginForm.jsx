@@ -3,22 +3,21 @@ import Input from './Input';
 import PasswordInput from './PasswordInput';
 
 export default function LoginForm() {
-    const loginMutation = useLoginMutation();
+    const { mutate, isPending, isError, error } = useLoginMutation();
     
-    async function handleSubmit(event) {
+    function handleSubmit(event) {
         event.preventDefault();
 
         const formData = Object.fromEntries(new FormData(event.currentTarget));
 
-        loginMutation.mutate(formData);        
+        mutate(formData);        
     }
 
-    const isErrorState = loginMutation.isError;
-    const fieldErrors = isErrorState ? (loginMutation.error?.responseData?.errors || {}) : {};    
+    const fieldErrors = isError ? (error?.responseData?.errors || {}) : {};    
     const hasFieldErrors = Object.keys(fieldErrors).length > 0;
    
-    const globalErrorMessage = (isErrorState && !hasFieldErrors) ? loginMutation.error?.message : '';
-    const showGlobalErrorMessage = isErrorState && !hasFieldErrors && !!globalErrorMessage;
+    const globalErrorMessage = (isError && !hasFieldErrors) ? error?.message : '';
+    const showGlobalErrorMessage = isError && !hasFieldErrors && !!globalErrorMessage;
 
     return (
         <form onSubmit={handleSubmit} className="w-[80%] max-w-100 flex flex-col gap-1">
@@ -32,7 +31,7 @@ export default function LoginForm() {
                     name="username"
                     placeholder="Username"
                     required
-                    disabled={loginMutation.isPending}
+                    disabled={isPending}
                 />
 
                 <span className={`text-xs text-red-500 pl-1 min-h-4 transition-opacity duration-150 ${fieldErrors.username ? 'visible opacity-100' : 'invisible opacity-0'}`}>
@@ -45,7 +44,7 @@ export default function LoginForm() {
                     name="password"
                     placeholder="Password"
                     required
-                    disabled={loginMutation.isPending}
+                    disabled={isPending}
                 />
 
                 <span className={`text-xs text-red-500 pl-1 min-h-4 transition-opacity duration-150 ${fieldErrors.password ? 'visible opacity-100' : 'invisible opacity-0'}`}>
@@ -55,10 +54,10 @@ export default function LoginForm() {
 
             <button
                 type="submit"
-                disabled={loginMutation.isPending}
+                disabled={isPending}
                 className="cursor-pointer w-full bg-black text-white rounded-xs py-2 px-6 mt-4 hover:bg-gray-700 transition-colors"
             >
-                {loginMutation.isPending ? 'Logging in...' : 'Log in'}
+                {isPending ? 'Logging in...' : 'Log in'}
             </button> 
         </form>
     );

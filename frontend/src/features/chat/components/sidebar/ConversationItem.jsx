@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router';
-import { formatLastConversationDate } from '../../../utils/date';
+import { formatLastConversationDate } from '../../../../utils/date';
 
 export default function ConversationItem({ chat }) {
     const latestMessage = chat.latestMessage?.text ?? 'No messages yet';
