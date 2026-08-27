@@ -1,5 +1,5 @@
 import { Outlet, useParams } from 'react-router';
-import ChatSidebar from '../ChatSidebar2';
+import ChatSidebar from '../../features/chat/components/sidebar/ChatSidebar';
 
 export default function MainLayout() {
     const { chatId } = useParams();
@@ -9,7 +9,7 @@ export default function MainLayout() {
         <div className="flex h-screen w-screen overflow-hidden">
             <aside className={`
                     ${isActiveChat ? 'hidden' : 'block w-full'} 
-                    md:block md:w-90 shrink-0 border-r border-slate-200
+                    md:block md:w-76 shrink-0 border-r border-slate-200
                 `}>
                 <ChatSidebar />
             </aside>

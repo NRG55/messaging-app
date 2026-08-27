@@ -8,6 +8,13 @@ export function useUserChats() {
     });
 }
 
+export function useActiveChatDetails(chatId) {
+    const { data: chats = [], isLoading, isError } = useUserChats();
+    const chat = chats.find((chat) => chat.id === chatId);
+
+    return { chat, isLoading, isError };
+}
+
 export function useChatMessages(chatId) {
     return useQuery({
         queryKey: ['chats', 'messages', chatId],
