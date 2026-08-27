@@ -1,13 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { Send } from 'lucide-react';
 import { useAuth } from '../../../auth/hooks';
 import { useActiveChatDetails, useChatMessages, useSendMessageMutation } from '../../hooks';
+import ActiveChatHeader from './ActiveChatHeader';
 
 export default function ActiveChatView() {
     const { chatId } = useParams();   
     const [messageText, setMessageText] = useState('');
     const messagesEndRef = useRef(null);
+    const navigate = useNavigate();
     
     const { user, isLoading: isAuthLoading } = useAuth();
     const { chat, isLoading: isChatLoading, isError: isChatError } = useActiveChatDetails(chatId);
@@ -52,18 +54,13 @@ export default function ActiveChatView() {
         : 'Last activity placeholder...';
 
     return (
-        <div className="flex-1 flex flex-col h-full bg-gray-50 overflow-hidden">
-            <div className="h-14 flex items-center shrink-0 px-4 bg-white border-b border-gray-200">
-                <div className="min-w-0">
-                    <h3 className="font-semibold text-sm text-gray-800 capitalize truncate">
-                        {chatTitle}
-                    </h3>
-
-                    <p className="mt-0.5 text-[10px] text-gray-400">
-                        {chatSubtitle}
-                    </p>
-                </div>
-            </div>
+        <div className="relative flex-1 flex flex-col h-full bg-gray-50 overflow-hidden">
+            <ActiveChatHeader 
+                chatTitle={chatTitle}
+                chatSubtitle={chatSubtitle}
+                chatAvatarUrl={chat?.avatarUrl}
+                onBackClick={() => navigate('/')}
+            />
 
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
                 {messages.length === 0 ? (
