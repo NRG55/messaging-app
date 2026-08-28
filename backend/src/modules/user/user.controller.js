@@ -1,4 +1,23 @@
-import * as userService from './user.service.js';
+import { userService, getUserProfile, updateUserProfile, getUsersNameAndAvatar } from './user.service.js';
+
+export const userController = {
+    async updateUserLastSeen(req, res, next) {
+        try {
+            const id = req.user?.id;
+
+            if (!id) {
+                throw new Error('UNAUTHORIZED');
+            }
+
+            await userService.updateUserLastSeen(id);
+
+            return res.sendStatus(204);
+
+        } catch (error) {
+            next(error);
+        }
+    },
+};
 
 export const getMe = async (req, res, next) => {
     try {       
@@ -8,7 +27,7 @@ export const getMe = async (req, res, next) => {
             throw new Error('UNAUTHORIZED');
         }
 
-        const profile = await userService.getUserProfile(id);
+        const profile = await getUserProfile(id);
         
         if (!profile) {
             throw new Error('USER_NOT_FOUND');
@@ -29,7 +48,7 @@ export const getProfile = async (req, res, next) => {
             throw new Error('INVALID_USER_ID');
         }
         
-        const userProfile = await userService.getUserProfile(id);
+        const userProfile = await getUserProfile(id);
 
         return res.status(200).json(userProfile);
 
@@ -47,7 +66,7 @@ export const updateProfile = async (req, res, next) => {
             throw new Error('UNAUTHORIZED');
         }
 
-        const updatedUser = await userService.updateUserProfile(userId, userProfile);
+        const updatedUser = await updateUserProfile(userId, userProfile);
 
         return res.status(200).json({
             success: true,
@@ -62,7 +81,7 @@ export const updateProfile = async (req, res, next) => {
 
 export const getAllUsers = async (req, res, next) => {
     try {       
-        const users = await userService.getUsersNameAndAvatar();
+        const users = await getUsersNameAndAvatar();
       
         return res.status(200).json(users);
 

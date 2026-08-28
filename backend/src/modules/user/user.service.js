@@ -1,6 +1,15 @@
 import prisma from '../../config/prisma.js';
 import cloudinary from '../../config/cloudinary.js';
 
+export const userService = {
+    async updateUserLastSeen(userId) {
+        return await prisma.user.update({
+            where: { id: userId },
+            data: { lastSeen: new Date() },
+        });
+    },
+};
+
 export const getUserProfile = async (userId) => {
     const userProfile = await prisma.user.findUnique({
         where: { id: userId },       
