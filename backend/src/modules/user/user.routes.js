@@ -4,7 +4,7 @@ import verifyToken from '../../middleware/verifyToken.js';
 
 const router = Router();
 
-router.post('/heartbeat', verifyToken, userController.updateUserLastSeen);
+router.post('/heartbeat', verifyToken, userController.recordUserActivity);
 router.get('/me', verifyToken, getMe);
 router.get('/profile/:id', getProfile);
 router.get('/all', getAllUsers);

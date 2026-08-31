@@ -19,6 +19,8 @@ model User {
 
     messages     Message[]
     memberships  ChatMember[]
+
+    @@index([lastSeen])
 }
 
 model Chat {

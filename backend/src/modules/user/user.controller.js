@@ -1,7 +1,7 @@
 import { userService, getUserProfile, updateUserProfile, getUsersNameAndAvatar } from './user.service.js';
 
 export const userController = {
-    async updateUserLastSeen(req, res, next) {
+    async recordUserActivity(req, res, next) {
         try {
             const id = req.user?.id;
 
@@ -9,7 +9,7 @@ export const userController = {
                 throw new Error('UNAUTHORIZED');
             }
 
-            await userService.updateUserLastSeen(id);
+            await userService.recordUserActivity(id);
 
             return res.sendStatus(204);
 
