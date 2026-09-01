@@ -1,7 +1,7 @@
 import { ChatService } from './chat.service.js';
 
 export const ChatController = {
-    async createDirectChat(req, res, next) {
+    async getOrCreateDirectChat(req, res, next) {
         try {
             const currentUserId = req.user.id;            
             const { targetUserId } = req.body;

@@ -2,15 +2,15 @@ import { body } from 'express-validator';
 import { handleValidationErrors } from '../../utils/validation.utils.js';
 
 export const ChatValidator = {
-    createDirectChat: [
-        body('recipientId')
+    getOrCreateDirectChat: [
+        body('targetUserId')
             .trim()
             .notEmpty().withMessage('Recipient ID is required.')
             .bail()
             .isUUID().withMessage('Invalid Recipient ID format.'),
        
-        body('recipientId').custom((recipientId, { req }) => {
-            if (req.user?.id === recipientId) {
+        body('targetUserId').custom((targetUserId, { req }) => {
+            if (req.user?.id === targetUserId) {
                 throw new Error('Sender and recipient IDs cannot be identical.');
             }
             return true;
