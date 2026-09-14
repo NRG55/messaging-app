@@ -4,23 +4,35 @@ import cloudinary from '../../config/cloudinary.js';
 const userActivityMap = new Map();
 const DB_WRITE_GAP_MS = 3 * 60 * 1000; // 3 minutes
 const CLEANUP_INTERVAL_MS = 12 * 60 * 60 * 1000; // 12 hours
-const USER_INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+const USER_INACTIVITY_TIMEOUT_MS = 2 * 60 * 1000; // 2 minutes
 
 export const userService = {
     async recordUserActivity(userId) {
         const now = Date.now();
         const lastDbWrite = userActivityMap.get(userId) || 0;
 
+        userActivityMap.set(userId, now);
+
         if (now - lastDbWrite <= DB_WRITE_GAP_MS) {
             return;
         }
-
-        userActivityMap.set(userId, now);
 
         return await prisma.user.update({
             where: { id: userId },
             data: { lastSeen: new Date(now) },
         });
+    },
+
+    isUserOnline(userId) {
+        const lastUserActivityDate = userActivityMap.get(userId);
+
+        if (!lastUserActivityDate) {
+            return false;
+        }
+
+        const now = Date.now();
+        
+        return (now - lastUserActivityDate) < USER_INACTIVITY_TIMEOUT_MS; 
     },
 };
 
@@ -31,7 +43,7 @@ function cleanupUserActivityMap() {
     for (const [userId, lastDbWrite] of userActivityMap.entries()) {
         if (now - lastDbWrite > USER_INACTIVITY_TIMEOUT_MS) {
             userActivityMap.delete(userId);
-            
+
             removedUsersCount++;
         }        
     }

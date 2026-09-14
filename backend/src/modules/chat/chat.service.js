@@ -1,4 +1,5 @@
 import prisma from '../../config/prisma.js';
+import { userService } from '../user/user.service.js';
 
 const BASE_CHAT_INCLUDE = {
     members: {
@@ -142,9 +143,6 @@ function normalizeChat(chat, currentUserId) {
     let isOnline = false;
     let lastSeen = null;
 
-    const ONLINE_GAP_CHECK_MS = 3.5 * 60 * 1000;
-    const now = Date.now();
-
     if (chat.type === 'DIRECT') {
         const otherMember = chat.members?.find(member => member.userId !== currentUserId);
 
@@ -152,7 +150,7 @@ function normalizeChat(chat, currentUserId) {
             chatName = otherMember.user.username;
             avatarUrl = otherMember.user.avatarUrl;
             lastSeen = otherMember.user.lastSeen;
-            isOnline = (now - new Date(lastSeen).getTime()) < ONLINE_GAP_CHECK_MS;
+            isOnline = userService.isUserOnline(otherMember.user.id);
         }
     }
 
@@ -162,16 +160,15 @@ function normalizeChat(chat, currentUserId) {
         chat.members.forEach(member => {
             if (!member.user) {
                 return;
-            } 
+            }
 
-            const memberLastSeen = member.user.lastSeen;
-            const memberOnlineStatus = (now - new Date(memberLastSeen).getTime()) < ONLINE_GAP_CHECK_MS;
+            const isMemberOnline = userService.isUserOnline(member.user.id);
 
             membersWithOnlineStatus.push({
                 ...member,
                 user: {
                     ...member.user,
-                    isOnline: memberOnlineStatus,
+                    isOnline: isMemberOnline,
                 },
             });
         });
