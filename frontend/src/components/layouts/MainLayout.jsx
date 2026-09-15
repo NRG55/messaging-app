@@ -1,9 +1,28 @@
 import { Outlet, useParams } from 'react-router';
 import ChatSidebar from '../../features/chat/components/sidebar/ChatSidebar';
+import { useEffect } from 'react';
+import { sendHeartbeat } from '../../features/user/api';
 
 export default function MainLayout() {
     const { chatId } = useParams();
     const isActiveChat = Boolean(chatId);
+
+    useEffect(() => {
+        const sendHeartbeatRequest = async () => {
+            try {
+                await sendHeartbeat();
+
+            } catch (error) {
+                console.error('Send heartbeat request failed:', error.message);
+            }
+        };
+        
+        sendHeartbeatRequest();
+
+        const heartbeatIntervalId = setInterval(sendHeartbeatRequest, 60000); // 1 minute
+       
+        return () => clearInterval(heartbeatIntervalId);
+    }, []);
 
     return (
         <div className="flex h-screen w-screen overflow-hidden">
