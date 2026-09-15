@@ -4,6 +4,8 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import errorHandler from './middleware/errorHandler.js';
 
+import { userService } from './modules/user/user.service.js';
+
 import authRoutes from './modules/auth/auth.routes.js';
 import userRoutes from './modules/user/user.routes.js';
 import chatRoutes from './modules/chat/chat.routes.js';
@@ -18,6 +20,8 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+userService.startCleanupUserActivity(); // every 30 minutes clear inactive users from memory
 
 app.get('/', (req, res) => {
     res.send('Messaging app server is running!');
