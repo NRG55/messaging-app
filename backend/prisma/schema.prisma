@@ -13,10 +13,14 @@ model User {
     password     String
     avatarUrl    String?
     bio          String?
+
     createdAt    DateTime  @default(now())
+    lastSeen     DateTime  @default(now())
 
     messages     Message[]
     memberships  ChatMember[]
+
+    @@index([lastSeen])
 }
 
 model Chat {
@@ -24,6 +28,8 @@ model Chat {
     type         ChatType
     name         String?
     createdAt    DateTime @default(now())
+
+    hash         String? @unique // for DIRECT chats to prevent race conditions during find or create chat 
 
     members      ChatMember[]
     messages     Message[]

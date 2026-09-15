@@ -9,7 +9,7 @@ const router = Router();
 
 router.get('/', verifyToken, ChatController.getUserChats);
 
-router.post('/direct', verifyToken, ChatValidator.createDirectChat, ChatController.createDirectChat);
+router.post('/direct', verifyToken, ChatValidator.getOrCreateDirectChat, ChatController.getOrCreateDirectChat);
 router.post('/group', verifyToken, ChatValidator.createGroupChat, ChatController.createGroupChat);
 
 router.get('/:chatId', verifyToken, ChatController.getChat);

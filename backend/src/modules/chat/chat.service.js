@@ -1,10 +1,16 @@
 import prisma from '../../config/prisma.js';
+import { userService } from '../user/user.service.js';
 
 const BASE_CHAT_INCLUDE = {
     members: {
         include: {
             user: {
-                select: { id: true, username: true, avatarUrl: true },
+                select: { 
+                    id: true, 
+                    username: true, 
+                    avatarUrl: true,
+                    lastSeen: true,
+                },
             },
         },
     },
@@ -12,27 +18,39 @@ const BASE_CHAT_INCLUDE = {
 
 export const ChatService = {
     async getOrCreateDirectChat(currentUserId, targetUserId) {
-        let chat = await prisma.chat.findFirst({
-            where: {
-                type: 'DIRECT',
-                AND: [
-                    { members: { some: { userId: currentUserId } } },
-                    { members: { some: { userId: targetUserId } } },
-                ],
-            },
+        const sortedIds = [currentUserId, targetUserId].sort();
+        const chatHash = `direct:${sortedIds[0]}_${sortedIds[1]}`;
+        
+        let chat = await prisma.chat.findUnique({
+            where: { hash: chatHash },
             include: BASE_CHAT_INCLUDE,
         });
 
         if (!chat) {
-            chat = await prisma.chat.create({
-                data: {
-                    type: 'DIRECT',
-                    members: {
-                        create: [{ userId: currentUserId }, { userId: targetUserId }],
+            try {
+                chat = await prisma.chat.create({
+                    data: {
+                        type: 'DIRECT',
+                        hash: chatHash,
+                        members: {
+                            create: [{ userId: currentUserId }, { userId: targetUserId }],
+                        },
                     },
-                },
-                include: BASE_CHAT_INCLUDE,
-            });
+                    include: BASE_CHAT_INCLUDE,
+                });
+            
+            } catch (error) {
+                // If another request created this chat just before this, catch the unique constraint failure (P2002) and fetch the newly created chat instead.
+                if (error.code === 'P2002') {
+                    chat = await prisma.chat.findUnique({
+                        where: { hash: chatHash },
+                        include: BASE_CHAT_INCLUDE,
+                    });
+                   
+                } else {
+                    throw error;
+                }
+            }
         }
 
         return normalizeChat(chat, currentUserId); 
@@ -122,6 +140,8 @@ export const ChatService = {
 function normalizeChat(chat, currentUserId) {
     let chatName = chat.name;
     let avatarUrl = chat.avatarUrl || null;
+    let isOnline = false;
+    let lastSeen = null;
 
     if (chat.type === 'DIRECT') {
         const otherMember = chat.members?.find(member => member.userId !== currentUserId);
@@ -129,7 +149,29 @@ function normalizeChat(chat, currentUserId) {
         if (otherMember?.user) {
             chatName = otherMember.user.username;
             avatarUrl = otherMember.user.avatarUrl;
+            lastSeen = otherMember.user.lastSeen;
+            isOnline = userService.isUserOnline(otherMember.user.id);
         }
+    }
+
+    const membersWithOnlineStatus = [];
+
+    if (chat.members) {
+        chat.members.forEach(member => {
+            if (!member.user) {
+                return;
+            }
+
+            const isMemberOnline = userService.isUserOnline(member.user.id);
+
+            membersWithOnlineStatus.push({
+                ...member,
+                user: {
+                    ...member.user,
+                    isOnline: isMemberOnline,
+                },
+            });
+        });
     }
 
     return {
@@ -138,5 +180,8 @@ function normalizeChat(chat, currentUserId) {
         name: chatName,
         avatarUrl,
         createdAt: chat.createdAt,
+        isOnline,
+        lastSeen,
+        members: membersWithOnlineStatus,
     };
 }
