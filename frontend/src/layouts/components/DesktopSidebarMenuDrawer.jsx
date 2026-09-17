@@ -1,5 +1,5 @@
 import { User, Users, LogOut, X } from 'lucide-react';
-import { useAuth, useLogoutMutation } from '../../../auth/hooks';
+import { useAuth, useLogoutMutation } from '../../features/auth/hooks';
 
 export default function MenuDrawer({ isOpen, onClose }) {
     const { user } = useAuth();

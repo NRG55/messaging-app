@@ -1,18 +1,15 @@
 import { Menu } from 'lucide-react';
-import { useUserChats } from '../../hooks';
-import ConversationList from './ConversationList';
-import MenuDrawer from './MenuDrawer';
+import ConversationList from '../../features/chat/components/ConversationList';
+import MenuDrawer from './DesktopSidebarMenuDrawer';
 import { useState } from 'react';
 
-export default function ChatSidebar() {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-    const { data: chats = [], isLoading } = useUserChats();
+export default function DesktopSidebar({ chats, isLoading }) {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);   
 
     if (isLoading) return <div>Loading...</div>;
 
     return (
-        <div className="flex h-full flex-col border-r border-gray-200">
+        <div className="flex h-full flex-col">
             <MenuDrawer isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
 
             <div className="p-3 flex items-center gap-2">                

@@ -1,9 +1,9 @@
-import MainLayout from './components/layouts/MainLayout';
-import AuthLayout from './components/layouts/AuthLayout';
+import MainLayout from './layouts/MainLayout';
+import AuthLayout from './layouts/AuthLayout';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import ProfileModal from './components/views/ProfileModal';
-import ActiveChatView from './features/chat/components/chat/ActiveChatView';
+import ActiveChatView from './features/chat/components/ActiveChatView';
 import PublicChatView from './components/views/PrivateChat';
 import { Navigate } from 'react-router';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -22,8 +22,8 @@ const routes = [
                     { path: 'settings', element: <h1>Settings</h1> },
                     { path: 'user/:username', element: <ProfileModal /> },
                 ],
-            },                        
-        ],                
+            },
+        ],
     },
     {
         path: '/auth',

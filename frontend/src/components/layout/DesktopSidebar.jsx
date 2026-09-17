@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router';
 import { Users, MessagesSquare, LogIn } from 'lucide-react';
-import useAuth from '../../hooks/useAuth';
+import useAuth from '../../features/auth/hooks/useAuth';
 
 const navItems = [
     { icon: MessagesSquare, label: 'Public Chat', path: '/' },
