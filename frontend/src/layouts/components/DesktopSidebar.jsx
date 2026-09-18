@@ -4,9 +4,7 @@ import MenuDrawer from './DesktopSidebarMenuDrawer';
 import { useState } from 'react';
 
 export default function DesktopSidebar({ chats, isLoading }) {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);   
-
-    if (isLoading) return <div>Loading...</div>;
+    const [isMenuOpen, setIsMenuOpen] = useState(false); 
 
     return (
         <div className="flex h-full flex-col">
@@ -31,7 +29,9 @@ export default function DesktopSidebar({ chats, isLoading }) {
                 </div>
             </div>
             
-            <ConversationList chats={chats} />
+            <div className="flex-1 flex flex-col overflow-hidden">
+                {!isLoading && <ConversationList chats={chats} />}
+            </div>
         </div>
     );
 }

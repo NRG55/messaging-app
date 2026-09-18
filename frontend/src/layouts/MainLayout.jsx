@@ -5,7 +5,7 @@ import { useUserChats } from '../features/chat/hooks';
 
 import DesktopSidebar from './components/DesktopSidebar';
 import MobileBottomNavbar from './components/MobileBottomNavbar';
-import MobileChatList from '../features/chat/components/MobileChatList';
+import MobileChatsView from '../features/chat/components/MobileChatsView';
 
 export default function MainLayout() {
     const { chatId } = useParams();
@@ -51,7 +51,7 @@ export default function MainLayout() {
             <div className="flex md:hidden h-full w-full flex-col relative bg-white">
                 <div className="flex-1 overflow-hidden">
                     {isChatListRoot ? (
-                        <MobileChatList chats={chats} isLoading={isLoading} />
+                        <MobileChatsView chats={chats} isLoading={isLoading} />
                     ) : (
                         <Outlet />
                     )}
