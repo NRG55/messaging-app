@@ -1,7 +1,15 @@
 import { Plus } from 'lucide-react';
 import ConversationList from './ConversationList';
+import NewChatModal from './NewChatModal';
+import { useState } from 'react';
 
 export default function MobileChatsView({ chats, isLoading }) {
+    const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
+    
+    const allUsersMock = [
+        { id: '1', username: 'UserA', lastSeen: '01.01.2026', avatarUrl: null },
+        { id: '2', username: 'UserB', lastSeen: '01.01.2026', avatarUrl: null },
+    ];
 
     return (
         <div className="flex flex-col h-full w-full">
@@ -13,9 +21,9 @@ export default function MobileChatsView({ chats, isLoading }) {
                 </h1>
 
                 <button 
-                    onClick={() => console.log('open menu')}
+                    onClick={() => setIsNewChatModalOpen(true)}
                     className="p-2 rounded-full cursor-pointer hover:bg-gray-50 transition-colors"
-                    aria-label="Open menu"
+                    aria-label="Open new chat modal"
                 >
                     <Plus className="w-5 h-5" />
                 </button>
@@ -24,6 +32,13 @@ export default function MobileChatsView({ chats, isLoading }) {
             <div className="flex-1 flex flex-col overflow-hidden">
                 {!isLoading && <ConversationList chats={chats} />}
             </div>
+
+            <NewChatModal 
+                isOpen={isNewChatModalOpen}
+                onClose={() => setIsNewChatModalOpen(false)}
+                allUsers={allUsersMock}
+                isUsersLoading={false}
+            />
         </div>
     );
 }
