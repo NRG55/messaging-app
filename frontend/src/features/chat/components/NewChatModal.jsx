@@ -1,14 +1,10 @@
 import { useState } from 'react';
 import { X, Search, Users, User } from 'lucide-react';
 
-export default function NewChatModal({ isOpen, onClose, allUsers = [] }) {
+export default function NewChatModal({ isOpen, onClose, allUsers = [], onTriggerCreateGroupFlow }) {
     const [searchTerm, setSearchTerm] = useState('');
 
     const filteredUsers = allUsers.filter(user => user.username?.toLowerCase().includes(searchTerm.toLowerCase()));
-
-    const handleCreateGroupChat = () => {
-        console.log('Create group chat');
-    };
 
     const handleOpenDirectChat = (userId) => {
         console.log('user ID:', userId);
@@ -35,7 +31,7 @@ export default function NewChatModal({ isOpen, onClose, allUsers = [] }) {
                     </h2>
 
                     <button 
-                        onClick={onClose}                        
+                        onClick={onClose}
                         aria-label="Close new chat modal"
                         className="p-2 rounded-full text-gray-400 cursor-pointer transition-colors duration-150
                         hover:bg-gray-100 hover:text-gray-600"
@@ -59,9 +55,9 @@ export default function NewChatModal({ isOpen, onClose, allUsers = [] }) {
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto">                   
+                <div className="flex-1 overflow-y-auto">
                     <button 
-                        onClick={handleCreateGroupChat}
+                        onClick={onTriggerCreateGroupFlow}
                         className="w-full flex items-center gap-3 py-3 px-6.5 mb-3 text-left border-b border-gray-50 cursor-pointer hover:bg-gray-50 transition-colors"
                     >                        
                         <Users className="w-5 h-5 stroke-2 text-blue-500" />
@@ -77,33 +73,33 @@ export default function NewChatModal({ isOpen, onClose, allUsers = [] }) {
                                 No matching users
                             </div>
                         ) : (
-                            filteredUsers.map((item) => (
+                            filteredUsers.map((user) => (
                                 <button
-                                    key={item.id}
-                                    onClick={() => handleOpenDirectChat(item.id)}
+                                    key={user.id}
+                                    onClick={() => handleOpenDirectChat(user.id)}
                                     className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-left cursor-pointer border-b border-gray-50"
                                 >
                                     <div className="shrink-0">
-                                        {item.avatarUrl ? (
+                                        {user.avatarUrl ? (
                                             <img 
-                                                src={item.avatarUrl} 
-                                                alt={item.username} 
+                                                src={user.avatarUrl} 
+                                                alt={user.username} 
                                                 className="w-10 h-10 rounded-full object-cover border border-gray-100"
                                             />
                                         ) : (
                                             <div className="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 font-semibold text-sm uppercase bg-gray-100">
-                                                {item.username?.charAt(0) || <User className="w-4 h-4 text-gray-400" />}
+                                                {user.username?.charAt(0) || <User className="w-4 h-4 text-gray-400" />}
                                             </div>
                                         )}
                                     </div>
 
                                     <div className="flex-1 min-w-0">
                                         <h4 className="text-sm text-gray-800 truncate capitalize">
-                                            {item.username}
+                                            {user.username}
                                         </h4>
 
                                         <span className="text-xs text-gray-400 truncate">
-                                            last seen {item.lastSeen}
+                                            last seen {user.lastSeen}
                                         </span>
                                     </div>
                                 </button>

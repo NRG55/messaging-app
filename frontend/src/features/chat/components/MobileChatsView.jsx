@@ -2,14 +2,34 @@ import { Plus } from 'lucide-react';
 import ConversationList from './ConversationList';
 import NewChatModal from './NewChatModal';
 import { useState } from 'react';
+import GroupChatCreationModal from './GroupChatCreationModal';
 
 export default function MobileChatsView({ chats, isLoading }) {
     const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
+    const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
     
     const allUsersMock = [
         { id: '1', username: 'UserA', lastSeen: '01.01.2026', avatarUrl: null },
         { id: '2', username: 'UserB', lastSeen: '01.01.2026', avatarUrl: null },
     ];
+
+    const handleStartGroupCreation = () => {
+        setIsNewChatModalOpen(false);
+        setIsCreateGroupModalOpen(true);
+    };
+
+    const handleCreateGroupSubmit = (chatName, chatMembersIds, imageFile) => {
+        const formData = new FormData();
+
+        formData.append('name', chatName);        
+        formData.append('memberIds', JSON.stringify(chatMembersIds));        
+       
+        if (imageFile) {
+            formData.append('imageFile', imageFile);
+        }
+
+        console.log(Object.fromEntries(formData));
+    };
 
     return (
         <div className="flex flex-col h-full w-full">
@@ -38,6 +58,14 @@ export default function MobileChatsView({ chats, isLoading }) {
                 onClose={() => setIsNewChatModalOpen(false)}
                 allUsers={allUsersMock}
                 isUsersLoading={false}
+                onTriggerCreateGroupFlow={handleStartGroupCreation}
+            />
+
+            <GroupChatCreationModal 
+                isOpen={isCreateGroupModalOpen}
+                onClose={() => setIsCreateGroupModalOpen(false)}
+                allUsers={allUsersMock}
+                onCreateGroup={handleCreateGroupSubmit}
             />
         </div>
     );
