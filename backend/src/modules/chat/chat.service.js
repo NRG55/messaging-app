@@ -56,7 +56,7 @@ export const ChatService = {
         return normalizeChat(chat, currentUserId); 
     },
 
-    async createGroupChat(creatorId, chatName, chatMembersIds) {
+    async createGroupChat(creatorId, chatName, chatMembersIds, avatarUrl) {
         const uniqueChatMemberIds = Array.from(new Set([creatorId, ...chatMembersIds]));
         const members = uniqueChatMemberIds.map((userId) => ({ userId }));
 
@@ -64,6 +64,7 @@ export const ChatService = {
             data: {
                 type: 'GROUP',
                 name: chatName,
+                avatarUrl,
                 members: {
                     create: members,
                 },
@@ -133,7 +134,7 @@ export const ChatService = {
 
         });        
 
-        return normalizedChats.sort((a, b) => b.lastActivity - a.lastActivity);
+        return normalizedChats.sort((a, b) => b.lastActivity.getTime() - a.lastActivity.getTime());
     },
 };
 

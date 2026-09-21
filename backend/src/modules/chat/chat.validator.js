@@ -25,6 +25,14 @@ export const ChatValidator = {
             .notEmpty().withMessage('Group chat name is required.'),
             
         body('chatMembersIds')
+            .customSanitizer((value) => {
+                try {
+                    return JSON.parse(value);
+
+                } catch {
+                    return null;
+                }
+            })
             .isArray({ min: 1 }).withMessage('At least one participant ID must be provided.'),
             
         handleValidationErrors,

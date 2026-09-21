@@ -27,6 +27,7 @@ model Chat {
     id           String   @id @default(uuid())
     type         ChatType
     name         String?
+    avatarUrl    String?
     createdAt    DateTime @default(now())
 
     hash         String? @unique // for DIRECT chats to prevent race conditions during find or create chat 

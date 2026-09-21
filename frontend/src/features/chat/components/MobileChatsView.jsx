@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useAllUsers } from '../../user/hooks';
+import { useCreateGroupChatMutation } from '../hooks';
 import ConversationList from './ConversationList';
 import NewChatModal from './NewChatModal';
 import GroupChatCreationModal from './GroupChatCreationModal';
@@ -10,6 +11,7 @@ export default function MobileChatsView({ chats, isLoading }) {
     const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
     
     const { data: allUsers = [] } = useAllUsers();
+    const { mutate: createGroupChat } = useCreateGroupChatMutation();
 
     const handleStartGroupCreation = () => {
         setIsNewChatModalOpen(false);
@@ -19,14 +21,14 @@ export default function MobileChatsView({ chats, isLoading }) {
     const handleCreateGroupSubmit = (chatName, chatMembersIds, avatarFile) => {
         const formData = new FormData();
 
-        formData.append('name', chatName);        
-        formData.append('memberIds', JSON.stringify(chatMembersIds));        
+        formData.append('chatName', chatName);        
+        formData.append('chatMembersIds', JSON.stringify(chatMembersIds));        
        
         if (avatarFile) {
-            formData.append('avatar', avatarFile);
+            formData.append('chatAvatar', avatarFile);
         }
 
-        console.log(Object.fromEntries(formData));
+        createGroupChat(formData);
     };
 
     return (
