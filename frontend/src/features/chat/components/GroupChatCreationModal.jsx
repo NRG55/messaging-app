@@ -1,13 +1,14 @@
 import { useRef, useState } from 'react';
 import { Search, Check, Camera } from 'lucide-react';
+import { formatLastConversationDate } from '../../../utils/date';
 
 export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [], onCreateGroup }) {
-    const [panel, setPanel] = useState('DETAILS'); // panel DETAILS (group name and picture), panel MEMBERS (group members selection)
+    const [panel, setPanel] = useState('DETAILS'); // panel DETAILS (group name and avatar), panel MEMBERS (group members selection)
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedUserIds, setSelectedUserIds] = useState([]);
     const [groupName, setGroupName] = useState('');
-    const [imageFile, setImageFile] = useState(null);
-    const [previewImage, setPreviewImage] = useState(null);
+    const [avatarFile, setAvatarFile] = useState(null);
+    const [previewAvatar, setPreviewAvatar] = useState(null);
     const fileInputRef = useRef(null);
 
     const filteredUsers = allUsers.filter(user => user.username?.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -21,8 +22,8 @@ export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [],
         
         const previewUrl = URL.createObjectURL(file);
 
-        setPreviewImage(previewUrl);
-        setImageFile(file);
+        setPreviewAvatar(previewUrl);
+        setAvatarFile(file);
     };
 
     const toggleUserSelection = (userId) => {
@@ -46,7 +47,7 @@ export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [],
             return;
         }
 
-        onCreateGroup(groupName.trim(), selectedUserIds, imageFile);
+        onCreateGroup(groupName.trim(), selectedUserIds, avatarFile);
         handleCloseModal();
     };
 
@@ -83,11 +84,11 @@ export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [],
                                 type="button"
                                 onClick={() => fileInputRef.current?.click()}
                                 aria-label="Set group profile picture"
-                                className="w-14 h-14 flex items-center justify-center rounded-full border border-gray-200 bg-gray-100 shadow-xs shrink-0 cursor-pointer"
+                                className="w-14 h-14 flex items-center justify-center rounded-full border border-gray-200 bg-gray-100 shadow-xs shrink-0 cursor-pointer overflow-hidden"
                             >
-                                {previewImage ? (
+                                {previewAvatar ? (
                                     <img 
-                                        src={previewImage}
+                                        src={previewAvatar}
                                         alt="Group profile picture preview"
                                         className="w-full h-full object-cover"
                                     />
@@ -191,7 +192,7 @@ export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [],
                                                     </h4>
 
                                                     <span className="text-xs text-gray-400">
-                                                        last seen {user.lastSeen}
+                                                        last seen {formatLastConversationDate(user.lastSeen)}
                                                     </span>
                                                 </div>
                                             </div>

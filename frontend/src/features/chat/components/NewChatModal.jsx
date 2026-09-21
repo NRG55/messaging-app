@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { X, Search, Users, User } from 'lucide-react';
+import { formatLastConversationDate } from '../../../utils/date';
 
 export default function NewChatModal({ isOpen, onClose, allUsers = [], onTriggerCreateGroupFlow }) {
     const [searchTerm, setSearchTerm] = useState('');
@@ -99,7 +100,7 @@ export default function NewChatModal({ isOpen, onClose, allUsers = [], onTrigger
                                         </h4>
 
                                         <span className="text-xs text-gray-400 truncate">
-                                            last seen {user.lastSeen}
+                                            last seen {formatLastConversationDate(user.lastSeen)}
                                         </span>
                                     </div>
                                 </button>

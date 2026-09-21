@@ -17,6 +17,22 @@ export const userController = {
             next(error);
         }
     },
+
+    async getAllExceptCurrentUser(req, res, next) {
+        try {
+            const currentUserId = req.user.id;
+
+            const users = await userService.getAllExceptCurrentUser(currentUserId);
+
+            return res.status(200).json({
+                success: true,
+                data: users,
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    },
 };
 
 export const getMe = async (req, res, next) => {

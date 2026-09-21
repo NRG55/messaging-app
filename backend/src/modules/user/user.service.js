@@ -52,6 +52,26 @@ export const userService = {
 
         }, 30 * 60 * 1000); // 30 minutes
     },
+
+    async getAllExceptCurrentUser(currentUserId) {
+        return await prisma.user.findMany({
+            where: {
+                id: {
+                    not: currentUserId,
+                },
+            },
+            select: {
+                id: true,
+                username: true,
+                avatarUrl: true,
+                lastSeen: true,
+                bio: true,
+            },
+            orderBy: {
+                username: 'asc',
+            },
+        });
+    },
 };
 
 export const getUserProfile = async (userId) => {

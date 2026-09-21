@@ -1,31 +1,29 @@
+import { useState } from 'react';
 import { Plus } from 'lucide-react';
+import { useAllUsers } from '../../user/hooks';
 import ConversationList from './ConversationList';
 import NewChatModal from './NewChatModal';
-import { useState } from 'react';
 import GroupChatCreationModal from './GroupChatCreationModal';
 
 export default function MobileChatsView({ chats, isLoading }) {
     const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
     const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
     
-    const allUsersMock = [
-        { id: '1', username: 'UserA', lastSeen: '01.01.2026', avatarUrl: null },
-        { id: '2', username: 'UserB', lastSeen: '01.01.2026', avatarUrl: null },
-    ];
+    const { data: allUsers = [] } = useAllUsers();
 
     const handleStartGroupCreation = () => {
         setIsNewChatModalOpen(false);
         setIsCreateGroupModalOpen(true);
     };
 
-    const handleCreateGroupSubmit = (chatName, chatMembersIds, imageFile) => {
+    const handleCreateGroupSubmit = (chatName, chatMembersIds, avatarFile) => {
         const formData = new FormData();
 
         formData.append('name', chatName);        
         formData.append('memberIds', JSON.stringify(chatMembersIds));        
        
-        if (imageFile) {
-            formData.append('imageFile', imageFile);
+        if (avatarFile) {
+            formData.append('avatar', avatarFile);
         }
 
         console.log(Object.fromEntries(formData));
@@ -56,7 +54,7 @@ export default function MobileChatsView({ chats, isLoading }) {
             <NewChatModal 
                 isOpen={isNewChatModalOpen}
                 onClose={() => setIsNewChatModalOpen(false)}
-                allUsers={allUsersMock}
+                allUsers={allUsers}
                 isUsersLoading={false}
                 onTriggerCreateGroupFlow={handleStartGroupCreation}
             />
@@ -64,7 +62,7 @@ export default function MobileChatsView({ chats, isLoading }) {
             <GroupChatCreationModal 
                 isOpen={isCreateGroupModalOpen}
                 onClose={() => setIsCreateGroupModalOpen(false)}
-                allUsers={allUsersMock}
+                allUsers={allUsers}
                 onCreateGroup={handleCreateGroupSubmit}
             />
         </div>
