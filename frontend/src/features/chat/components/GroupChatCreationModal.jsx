@@ -30,17 +30,6 @@ export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [],
         setSelectedUserIds(prev => prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]);
     };
 
-    const handleCloseModal = () => {
-        onClose();
-        // Wait for slide-down animation to prevent the 'DETAILS' panel from flashing visible while closing the last panel
-        setTimeout(() => {
-            setSearchTerm('');
-            setSelectedUserIds([]);
-            setGroupName('');
-            setPanel('DETAILS');
-        }, 300);
-    };
-
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!groupName.trim() || selectedUserIds.length === 0) {
@@ -49,6 +38,25 @@ export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [],
 
         onCreateGroup(groupName.trim(), selectedUserIds, avatarFile);
         handleCloseModal();
+    };
+
+    const handleBackToDetailsPanel = () => {
+        setSearchTerm('');
+        setSelectedUserIds([]);
+        setPanel('DETAILS');
+    };
+
+    const handleCloseModal = () => {
+        onClose();
+        // Wait for slide-down animation to prevent the 'DETAILS' panel from flashing visible while closing the last panel
+        setTimeout(() => {
+            setSearchTerm('');
+            setSelectedUserIds([]);
+            setGroupName('');
+            setPanel('DETAILS');
+            setPreviewAvatar(null);
+            setAvatarFile(null);
+        }, 300);
     };
 
     return (
@@ -210,7 +218,7 @@ export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [],
                         <div className="flex justify-end gap-2 p-3 border-t border-gray-100 shrink-0">
                             <button
                                 type="button"
-                                onClick={handleCloseModal}
+                                onClick={handleBackToDetailsPanel}
                                 className="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-xs cursor-pointer transition-colors"
                             >
                                 Cancel

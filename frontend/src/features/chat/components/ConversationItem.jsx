@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router';
 import { formatLastConversationDate } from '../../../utils/date';
+import { User, Users } from 'lucide-react';
 
 export default function ConversationItem({ chat }) {
     const latestMessage = chat.latestMessage?.text ?? 'No messages yet';
@@ -27,7 +28,11 @@ export default function ConversationItem({ chat }) {
                     />
                 ) : (
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-linear-to-tr from-green-700 to-green-800 text-white font-bold shadow-sm uppercase">
-                        {chat.name?.charAt(0) || ''}
+                        {chat.name?.charAt(0) || (
+                            chat.type === 'GROUP' 
+                                ? <Users className="w-5 h-5 text-green-100" /> 
+                                : <User className="w-5 h-5 text-green-100" />
+                        )}
                     </div>
                 )}
 

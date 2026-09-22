@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { Plus } from 'lucide-react';
 import { useAllUsers } from '../../user/hooks';
 import { useCreateGroupChatMutation } from '../hooks';
@@ -9,6 +10,7 @@ import GroupChatCreationModal from './GroupChatCreationModal';
 export default function MobileChatsView({ chats, isLoading }) {
     const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
     const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
+    const navigate = useNavigate();
     
     const { data: allUsers = [] } = useAllUsers();
     const { mutate: createGroupChat } = useCreateGroupChatMutation();
@@ -28,7 +30,15 @@ export default function MobileChatsView({ chats, isLoading }) {
             formData.append('chatAvatar', avatarFile);
         }
 
-        createGroupChat(formData);
+        createGroupChat(formData, {
+            onSuccess: (newChat) => {
+                setIsCreateGroupModalOpen(false);
+
+                if (newChat?.id) {
+                    navigate(`/chat/${newChat.id}`);
+                }
+            },
+        });
     };
 
     return (
