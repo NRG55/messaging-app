@@ -3,12 +3,16 @@ import ConversationList from '../../features/chat/components/ConversationList';
 import MenuDrawer from './DesktopSidebarMenuDrawer';
 import { useState } from 'react';
 
-export default function DesktopSidebar({ chats, isLoading }) {
+export default function DesktopSidebar({ chats, isLoading, onTriggerCreateGroup }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false); 
 
     return (
         <div className="flex h-full flex-col">
-            <MenuDrawer isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+            <MenuDrawer 
+                isOpen={isMenuOpen} 
+                onClose={() => setIsMenuOpen(false)}
+                onTriggerCreateGroup={onTriggerCreateGroup} 
+            />
 
             <div className="p-3 flex items-center gap-2">                
                 <button

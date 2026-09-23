@@ -1,44 +1,15 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
 import { Plus } from 'lucide-react';
-import { useAllUsers } from '../../user/hooks';
-import { useCreateGroupChatMutation } from '../hooks';
+
 import ConversationList from './ConversationList';
 import NewChatModal from './NewChatModal';
-import GroupChatCreationModal from './GroupChatCreationModal';
 
-export default function MobileChatsView({ chats, isLoading }) {
-    const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
-    const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
-    const navigate = useNavigate();
-    
-    const { data: allUsers = [] } = useAllUsers();
-    const { mutate: createGroupChat } = useCreateGroupChatMutation();
+export default function MobileChatsView({ chats, isLoading, allUsers, onTriggerCreateGroup }) {
+    const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);   
 
     const handleStartGroupCreation = () => {
         setIsNewChatModalOpen(false);
-        setIsCreateGroupModalOpen(true);
-    };
-
-    const handleCreateGroupSubmit = (chatName, chatMembersIds, avatarFile) => {
-        const formData = new FormData();
-
-        formData.append('chatName', chatName);        
-        formData.append('chatMembersIds', JSON.stringify(chatMembersIds));        
-       
-        if (avatarFile) {
-            formData.append('chatAvatar', avatarFile);
-        }
-
-        createGroupChat(formData, {
-            onSuccess: (newChat) => {
-                setIsCreateGroupModalOpen(false);
-
-                if (newChat?.id) {
-                    navigate(`/chat/${newChat.id}`);
-                }
-            },
-        });
+        onTriggerCreateGroup();
     };
 
     return (
@@ -69,13 +40,6 @@ export default function MobileChatsView({ chats, isLoading }) {
                 allUsers={allUsers}
                 isUsersLoading={false}
                 onTriggerCreateGroupFlow={handleStartGroupCreation}
-            />
-
-            <GroupChatCreationModal 
-                isOpen={isCreateGroupModalOpen}
-                onClose={() => setIsCreateGroupModalOpen(false)}
-                allUsers={allUsers}
-                onCreateGroup={handleCreateGroupSubmit}
             />
         </div>
     );

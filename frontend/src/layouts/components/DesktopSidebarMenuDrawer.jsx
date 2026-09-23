@@ -1,9 +1,14 @@
 import { User, Users, LogOut, X } from 'lucide-react';
 import { useAuth, useLogoutMutation } from '../../features/auth/hooks';
 
-export default function MenuDrawer({ isOpen, onClose }) {
+export default function MenuDrawer({ isOpen, onClose, onTriggerCreateGroup }) {
     const { user } = useAuth();
     const { mutate: logout, isPending } = useLogoutMutation();
+
+    const handleNewGroupClick = () => {
+        onClose();
+        onTriggerCreateGroup();
+    };
 
     return (
         <>
@@ -26,7 +31,7 @@ export default function MenuDrawer({ isOpen, onClose }) {
                         className="cursor-pointer absolute top-3 right-3 text-gray-400 hover:text-gray-600"
                     >
                         <X className="h-4 w-4" />
-                    </button>                    
+                    </button>
 
                     <div className="h-12 w-12 flex items-center justify-center rounded-full bg-gray-300 text-gray-600 font-bold text-lg">
                         {user?.username?.charAt(0).toUpperCase() || ''}
@@ -35,7 +40,7 @@ export default function MenuDrawer({ isOpen, onClose }) {
                     <div className="min-w-0">
                         <p className="text-sm font-semibold text-gray-800 capitalize truncate">
                             {user?.username || ''}
-                        </p>                        
+                        </p>
                     </div>
                 </div>
 
@@ -53,7 +58,7 @@ export default function MenuDrawer({ isOpen, onClose }) {
 
                     <div className="py-2">
                         <button 
-                            onClick={() => console.log('Open add group modal')}
+                            onClick={handleNewGroupClick}
                             disabled={isPending}
                             className="cursor-pointer w-full flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                         >
@@ -64,8 +69,8 @@ export default function MenuDrawer({ isOpen, onClose }) {
                 </div>
                 
                 <div className="py-2 border-t border-gray-200">
-                    <button                         
-                        onClick={() => logout()}                        
+                    <button
+                        onClick={() => logout()}
                         disabled={isPending}
                         className="cursor-pointer w-full flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                     >
