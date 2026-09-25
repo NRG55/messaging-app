@@ -1,23 +1,6 @@
 import { userService, getUserProfile, updateUserProfile, getUsersNameAndAvatar } from './user.service.js';
 
 export const userController = {
-    async recordUserActivity(req, res, next) {
-        try {
-            const id = req.user?.id;
-
-            if (!id) {
-                throw new Error('UNAUTHORIZED');
-            }
-
-            await userService.recordUserActivity(id);
-
-            return res.sendStatus(204);
-
-        } catch (error) {
-            next(error);
-        }
-    },
-
     async getAllExceptCurrentUser(req, res, next) {
         try {
             const currentUserId = req.user.id;

@@ -1,5 +1,5 @@
 import prisma from '../../config/prisma.js';
-import { userService } from '../user/user.service.js';
+import { SessionService } from '../session/session.service.js';
 
 const BASE_CHAT_INCLUDE = {
     members: {
@@ -151,7 +151,7 @@ function normalizeChat(chat, currentUserId) {
             chatName = otherMember.user.username;
             avatarUrl = otherMember.user.avatarUrl;
             lastSeen = otherMember.user.lastSeen;
-            isOnline = userService.isUserOnline(otherMember.user.id);
+            isOnline = SessionService.isUserOnline(otherMember.user.id);
         }
     }
 
@@ -163,7 +163,7 @@ function normalizeChat(chat, currentUserId) {
                 return;
             }
 
-            const isMemberOnline = userService.isUserOnline(member.user.id);
+            const isMemberOnline = SessionService.isUserOnline(member.user.id);
 
             membersWithOnlineStatus.push({
                 ...member,
