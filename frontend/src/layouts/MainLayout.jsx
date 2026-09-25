@@ -1,6 +1,6 @@
+import { useState } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router';
-import { useEffect, useState } from 'react';
-import { sendHeartbeat } from '../features/user/api';
+import { useHeartbeat } from '../features/session/hooks';
 import { useCreateGroupChatMutation, useUserChats } from '../features/chat/hooks';
 import { useAllUsers } from '../features/user/hooks';
 
@@ -14,51 +14,28 @@ export default function MainLayout() {
     const location = useLocation();
     const navigate = useNavigate();
 
+    useHeartbeat(60000); // interval 1 minute
+
     const isChatListRoot = location.pathname === '/';
     const isActiveChat = Boolean(chatId);
 
-    const { data: chats = [], isLoading } = useUserChats();
+    const { data: chats = [], isLoading: isChatsLoading } = useUserChats();
     const { data: allUsers = [] } = useAllUsers();
-    const { mutate: createGroupChat } = useCreateGroupChatMutation();
+    const { mutate: createGroupChat, isPending: isCreatingGroup } = useCreateGroupChatMutation();
 
     const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
 
     const handleCreateGroupSubmit = (chatName, chatMembersIds, avatarFile) => {
-        const formData = new FormData();
-
-        formData.append('chatName', chatName);        
-        formData.append('chatMembersIds', JSON.stringify(chatMembersIds));
-
-        if (avatarFile) {
-            formData.append('chatAvatar', avatarFile);
-        }
-
-        createGroupChat(formData, {
+        createGroupChat({ chatName, chatMembersIds, avatarFile }, {
             onSuccess: (newChat) => {
                 setIsCreateGroupModalOpen(false);
+
                 if (newChat?.id) {
                     navigate(`/chat/${newChat.id}`);
                 }
             },
         });
     };
-
-    useEffect(() => {
-        const sendHeartbeatRequest = async () => {
-            try {
-                await sendHeartbeat();
-
-            } catch (error) {
-                console.error('Send heartbeat request failed:', error.message);
-            }
-        };
-        
-        sendHeartbeatRequest();
-
-        const heartbeatIntervalId = setInterval(sendHeartbeatRequest, 60000); // 1 minute
-       
-        return () => clearInterval(heartbeatIntervalId);
-    }, []);
 
     return (
         <div className="flex h-screen w-screen overflow-hidden">
@@ -68,7 +45,7 @@ export default function MainLayout() {
                 <aside className="w-76 shrink-0 border-r border-gray-200 bg-white">
                     <DesktopSidebar 
                         chats={chats} 
-                        isLoading={isLoading}
+                        isLoading={isChatsLoading}
                         onTriggerCreateGroup={() => setIsCreateGroupModalOpen(true)} 
                     />
                 </aside>
@@ -84,7 +61,7 @@ export default function MainLayout() {
                     {isChatListRoot ? (
                         <MobileChatsView 
                             chats={chats} 
-                            isLoading={isLoading}
+                            isLoading={isChatsLoading}
                             allUsers={allUsers}
                             onTriggerCreateGroup={() => setIsCreateGroupModalOpen(true)} 
                         />
@@ -96,12 +73,16 @@ export default function MainLayout() {
                 {!isActiveChat && <MobileBottomNavbar />}
             </div>
 
-            <GroupChatCreationModal 
-                isOpen={isCreateGroupModalOpen}
-                onClose={() => setIsCreateGroupModalOpen(false)}
-                onCreateGroup={handleCreateGroupSubmit}
-                allUsers={allUsers}
-            />
+            {/* DESKTOP & MOBILE */}
+            {isCreateGroupModalOpen && (
+                <GroupChatCreationModal 
+                    isOpen={isCreateGroupModalOpen}
+                    onClose={() => setIsCreateGroupModalOpen(false)}
+                    onCreateGroup={handleCreateGroupSubmit}
+                    allUsers={allUsers}
+                    isSubmitting={isCreatingGroup} 
+                />
+            )}
         </div>
     );
 }
