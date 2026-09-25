@@ -74,15 +74,13 @@ export default function MainLayout() {
             </div>
 
             {/* DESKTOP & MOBILE */}
-            {isCreateGroupModalOpen && (
-                <GroupChatCreationModal 
-                    isOpen={isCreateGroupModalOpen}
-                    onClose={() => setIsCreateGroupModalOpen(false)}
-                    onCreateGroup={handleCreateGroupSubmit}
-                    allUsers={allUsers}
-                    isSubmitting={isCreatingGroup} 
-                />
-            )}
+            <GroupChatCreationModal 
+                isOpen={isCreateGroupModalOpen}
+                onClose={() => setIsCreateGroupModalOpen(false)}
+                onCreateGroup={handleCreateGroupSubmit}
+                allUsers={allUsers}
+                isSubmitting={isCreatingGroup} 
+            />
         </div>
     );
 }

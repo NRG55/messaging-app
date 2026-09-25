@@ -48,7 +48,7 @@ export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [],
 
     const handleCloseModal = () => {
         onClose();
-        // Wait for slide-down animation to prevent the 'DETAILS' panel from flashing visible while closing the last panel
+        // Wait for slide-down animation
         setTimeout(() => {
             setSearchTerm('');
             setSelectedUserIds([]);
