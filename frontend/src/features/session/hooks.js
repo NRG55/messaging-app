@@ -3,18 +3,18 @@ import { sendHeartbeat } from './api';
 
 export function useHeartbeat(intervalMs = 60000) {
     useEffect(() => {
-        const startHeartbeat = async () => {
+        const runHeartbeat = async () => {
             try {
                 await sendHeartbeat();
 
-            } catch (error) {               
+            } catch (error) {
                 console.error('Send heartbeat request failed:', error.message);
             }
         };
 
-        startHeartbeat();
+        runHeartbeat();
 
-        const intervalId = setInterval(startHeartbeat, intervalMs);
+        const intervalId = setInterval(runHeartbeat, intervalMs);
 
         return () => clearInterval(intervalId);
     }, [intervalMs]);
