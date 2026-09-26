@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { Send } from 'lucide-react';
-import { useAuth } from '../../../auth/hooks';
-import { useActiveChatDetails, useChatMessages, useSendMessageMutation } from '../../hooks';
+import { useAuth } from '../../auth/hooks';
+import { useActiveChatDetails, useChatMessages, useSendMessageMutation } from '../hooks';
 import ActiveChatHeader from './ActiveChatHeader';
 
 export default function ActiveChatView() {

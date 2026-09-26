@@ -22,8 +22,9 @@ export const ChatController = {
         try {
             const creatorId = req.user.id;
             const { chatName, chatMembersIds } = req.body;
+            const avatarUrl = req.file ? req.file.path : null;
 
-            const groupChat = await ChatService.createGroupChat(creatorId, chatName, chatMembersIds);
+            const groupChat = await ChatService.createGroupChat(creatorId, chatName, chatMembersIds, avatarUrl);
 
             return res.status(201).json({
                 success: true,

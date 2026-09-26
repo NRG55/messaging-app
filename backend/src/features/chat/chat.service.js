@@ -1,5 +1,5 @@
 import prisma from '../../config/prisma.js';
-import { userService } from '../user/user.service.js';
+import { SessionService } from '../session/session.service.js';
 
 const BASE_CHAT_INCLUDE = {
     members: {
@@ -56,7 +56,7 @@ export const ChatService = {
         return normalizeChat(chat, currentUserId); 
     },
 
-    async createGroupChat(creatorId, chatName, chatMembersIds) {
+    async createGroupChat(creatorId, chatName, chatMembersIds, avatarUrl) {
         const uniqueChatMemberIds = Array.from(new Set([creatorId, ...chatMembersIds]));
         const members = uniqueChatMemberIds.map((userId) => ({ userId }));
 
@@ -64,6 +64,7 @@ export const ChatService = {
             data: {
                 type: 'GROUP',
                 name: chatName,
+                avatarUrl,
                 members: {
                     create: members,
                 },
@@ -133,7 +134,7 @@ export const ChatService = {
 
         });        
 
-        return normalizedChats.sort((a, b) => b.lastActivity - a.lastActivity);
+        return normalizedChats.sort((a, b) => b.lastActivity.getTime() - a.lastActivity.getTime());
     },
 };
 
@@ -150,7 +151,7 @@ function normalizeChat(chat, currentUserId) {
             chatName = otherMember.user.username;
             avatarUrl = otherMember.user.avatarUrl;
             lastSeen = otherMember.user.lastSeen;
-            isOnline = userService.isUserOnline(otherMember.user.id);
+            isOnline = SessionService.isUserOnline(otherMember.user.id);
         }
     }
 
@@ -162,7 +163,7 @@ function normalizeChat(chat, currentUserId) {
                 return;
             }
 
-            const isMemberOnline = userService.isUserOnline(member.user.id);
+            const isMemberOnline = SessionService.isUserOnline(member.user.id);
 
             membersWithOnlineStatus.push({
                 ...member,
