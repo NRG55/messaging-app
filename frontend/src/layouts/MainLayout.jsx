@@ -16,7 +16,7 @@ export default function MainLayout() {
 
     useHeartbeat(60000); // interval 1 minute
 
-    const isChatListRoot = location.pathname === '/';
+    const isRootPath = location.pathname === '/'; 
     const isActiveChat = Boolean(chatId);
 
     const { data: chats = [], isLoading: isChatsLoading } = useUserChats();
@@ -58,7 +58,7 @@ export default function MainLayout() {
             {/* MOBILE */}
             <div className="flex md:hidden h-full w-full flex-col relative bg-white">
                 <div className="flex-1 overflow-hidden">
-                    {isChatListRoot ? (
+                    {isRootPath ? (
                         <MobileChatsView 
                             chats={chats} 
                             isLoading={isChatsLoading}

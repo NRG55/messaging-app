@@ -8,6 +8,7 @@ import PublicChatView from './components/views/PrivateChat';
 import { Navigate } from 'react-router';
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicRoute from './components/PublicRoute';
+import MobileSettingsView from './features/user/components/MobileSettingsView';
 
 const routes = [
     {
@@ -19,7 +20,7 @@ const routes = [
                 children: [
                     { index: true, element: <PublicChatView /> },
                     { path: 'chat/:chatId', element: <ActiveChatView /> },
-                    { path: 'settings', element: <h1>Settings</h1> },
+                    { path: 'settings', element: <MobileSettingsView /> },
                     { path: 'user/:username', element: <ProfileModal /> },
                 ],
             },
