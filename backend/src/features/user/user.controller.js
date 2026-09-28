@@ -1,11 +1,27 @@
-import { userService, getUserProfile, updateUserProfile, getUsersNameAndAvatar } from './user.service.js';
+import { UserService } from './user.service.js';
 
-export const userController = {
+export const UserController = {
+    async getMe(req, res, next) {
+        try {
+            const currentUserId = req.user.id; 
+            
+            const currentUser = await UserService.findById(currentUserId);
+
+            return res.status(200).json({
+                success: true,
+                data: currentUser,
+            });
+
+        } catch (error) {
+            next(error); 
+        }
+    },
+
     async getAllExceptCurrentUser(req, res, next) {
         try {
             const currentUserId = req.user.id;
 
-            const users = await userService.getAllExceptCurrentUser(currentUserId);
+            const users = await UserService.getAllExceptCurrentUser(currentUserId);
 
             return res.status(200).json({
                 success: true,
@@ -16,75 +32,28 @@ export const userController = {
             next(error);
         }
     },
-};
 
-export const getMe = async (req, res, next) => {
-    try {       
-        const id = req.user?.id;
+    async updateProfile(req, res, next) {
+        try {
+            const userId = req.user.id;
+            const { username, bio } = req.body;
 
-        if (!id) {
-            throw new Error('UNAUTHORIZED');
+            const updateData = { username, bio };
+            console.log(req.file);
+            if (req.file) {
+                updateData.avatarUrl = req.file.path;
+            }
+
+            const updatedUser = await UserService.updateProfile(userId, updateData);
+
+            return res.status(200).json({
+                success: true,
+                message: 'Profile updated successfully!',
+                data: updatedUser,
+            });
+
+        } catch (error) {
+            next(error);
         }
-
-        const profile = await getUserProfile(id);
-        
-        if (!profile) {
-            throw new Error('USER_NOT_FOUND');
-        }
-
-        return res.status(200).json(profile);
-
-    } catch (error) {
-        next(error);
-    }
-};
-
-export const getProfile = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-       
-        if (!id || id.length !== 36) {
-            throw new Error('INVALID_USER_ID');
-        }
-        
-        const userProfile = await getUserProfile(id);
-
-        return res.status(200).json(userProfile);
-
-    } catch (error) {        
-        next(error);
-    }
-};
-
-export const updateProfile = async (req, res, next) => {
-    try {
-        const userId = req.user?.id;
-        const userProfile = req.body;
-
-        if (!userId) {
-            throw new Error('UNAUTHORIZED');
-        }
-
-        const updatedUser = await updateUserProfile(userId, userProfile);
-
-        return res.status(200).json({
-            success: true,
-            message: 'Profile updated successfully!',
-            data: updatedUser,
-        });
-
-    } catch (error) {
-        next(error);
-    }
-};
-
-export const getAllUsers = async (req, res, next) => {
-    try {       
-        const users = await getUsersNameAndAvatar();
-      
-        return res.status(200).json(users);
-
-    } catch (error) {
-        next(error);
-    }
+    },
 };
