@@ -1,8 +1,9 @@
 import { User, Users, LogOut, X } from 'lucide-react';
-import { useAuth, useLogoutMutation } from '../../features/auth/hooks';
+import { useCurrentUser } from '../../features/user/hooks';
+import { useLogoutMutation } from '../../features/auth/hooks';
 
 export default function MenuDrawer({ isOpen, onClose, onTriggerCreateGroup }) {
-    const { user } = useAuth();
+    const { user } = useCurrentUser();
     const { mutate: logout, isPending } = useLogoutMutation();
 
     const handleNewGroupClick = () => {

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { Send } from 'lucide-react';
-import { useAuth } from '../../auth/hooks';
+import { useCurrentUser } from '../../user/hooks';
 import { useActiveChatDetails, useChatMessages, useSendMessageMutation } from '../hooks';
 import ActiveChatHeader from './ActiveChatHeader';
 
@@ -9,16 +9,33 @@ export default function ActiveChatView() {
     const { chatId } = useParams();   
     const [messageText, setMessageText] = useState('');
     const messagesEndRef = useRef(null);
+    const isInitialLoadRef = useRef(false);
     const navigate = useNavigate();
     
-    const { user, isLoading: isAuthLoading } = useAuth();
+    const { user, isLoading: isAuthLoading } = useCurrentUser();
     const { chat, isLoading: isChatLoading, isError: isChatError } = useActiveChatDetails(chatId);
     const { data: messages = [], isLoading: isMessagesLoading, isError: isMessagesError } = useChatMessages(chatId);
     const { mutate, isPending } = useSendMessageMutation(chatId);
     
     useEffect(() => {
+        isInitialLoadRef.current = false;
+    }, [chatId]);
+    
+    useEffect(() => {
+        if (messages.length === 0) {
+            return;
+        }
+        
+        if (!isInitialLoadRef.current) {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+            isInitialLoadRef.current = true;
+
+            return;
+        }
+       
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
+
+    }, [messages, isChatLoading, isMessagesLoading]);
 
     function handleSendMessage(event) {
         event.preventDefault();
