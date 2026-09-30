@@ -1,41 +1,29 @@
 import { useState } from 'react';
-import { Outlet, useLocation, useNavigate, useParams } from 'react-router';
+import { Outlet, useLocation, useParams } from 'react-router';
 import { useHeartbeat } from '../features/session/hooks';
-import { useCreateGroupChatMutation, useUserChats } from '../features/chat/hooks';
+import { useUserChats } from '../features/chat/hooks';
 import { useAllUsers } from '../features/user/hooks';
 
 import DesktopSidebar from './components/DesktopSidebar';
 import MobileBottomNavbar from './components/MobileBottomNavbar';
 import MobileChatsView from '../features/chat/components/MobileChatsView';
 import GroupChatCreationModal from '../features/chat/components/GroupChatCreationModal';
+import ProfileModal from '../features/user/components/ProfileModal';
 
 export default function MainLayout() {
     const { chatId } = useParams();
     const location = useLocation();
-    const navigate = useNavigate();
 
     useHeartbeat(60000); // interval 1 minute
 
-    const isRootPath = location.pathname === '/'; 
+    const isRootPath = location.pathname === '/';
     const isActiveChat = Boolean(chatId);
 
     const { data: chats = [], isLoading: isChatsLoading } = useUserChats();
     const { data: allUsers = [] } = useAllUsers();
-    const { mutate: createGroupChat, isPending: isCreatingGroup } = useCreateGroupChatMutation();
 
     const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
-
-    const handleCreateGroupSubmit = (chatName, chatMembersIds, avatarFile) => {
-        createGroupChat({ chatName, chatMembersIds, avatarFile }, {
-            onSuccess: (newChat) => {
-                setIsCreateGroupModalOpen(false);
-
-                if (newChat?.id) {
-                    navigate(`/chat/${newChat.id}`);
-                }
-            },
-        });
-    };
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
     return (
         <div className="flex h-screen w-screen overflow-hidden">
@@ -66,7 +54,7 @@ export default function MainLayout() {
                             onTriggerCreateGroup={() => setIsCreateGroupModalOpen(true)} 
                         />
                     ) : (
-                        <Outlet />
+                        <Outlet context={{ onTriggerProfileModal: () => setIsProfileModalOpen(true) }} />
                     )}
                 </div>
 
@@ -74,12 +62,15 @@ export default function MainLayout() {
             </div>
 
             {/* DESKTOP & MOBILE */}
-            <GroupChatCreationModal 
+            <GroupChatCreationModal
                 isOpen={isCreateGroupModalOpen}
                 onClose={() => setIsCreateGroupModalOpen(false)}
-                onCreateGroup={handleCreateGroupSubmit}
                 allUsers={allUsers}
-                isSubmitting={isCreatingGroup} 
+            />
+
+            <ProfileModal
+                isOpen={isProfileModalOpen}
+                onClose={() => setIsProfileModalOpen(false)}
             />
         </div>
     );

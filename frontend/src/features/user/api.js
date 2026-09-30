@@ -4,7 +4,7 @@ export const fetchAllUsers = () => api('/users/all');
 
 export const fetchCurrentUser = () => api('/users/me');
 
-export const updateCurrentUserProfile = (updatedUserData) => api('/users', {
+export const updateCurrentUserProfile = (formData) => api('/users', {
     method: 'PATCH',
-    body: updatedUserData,
+    body: formData,
 });
