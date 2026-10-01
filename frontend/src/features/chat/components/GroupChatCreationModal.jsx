@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router';
 import { Search, Check, Camera } from 'lucide-react';
 import { formatLastConversationDate } from '../../../utils/date';
 import { useCreateGroupChatMutation } from '../hooks';
+import { useAllUsers } from '../../user/hooks';
 
-export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [] }) {
+export default function GroupChatCreationModal({ isOpen, onClose }) {
     const [panel, setPanel] = useState('DETAILS'); // panel DETAILS (group name and avatar), panel MEMBERS (group members selection)
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedUserIds, setSelectedUserIds] = useState([]);
@@ -14,9 +15,10 @@ export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [] 
     const fileInputRef = useRef(null);
     const navigate = useNavigate();
 
-    const filteredUsers = allUsers.filter(user => user.username?.toLowerCase().includes(searchTerm.toLowerCase()));
-
+    const { data: allUsers = [] } = useAllUsers();
     const { mutate: createGroupChat, isPending: isCreatingGroup } = useCreateGroupChatMutation();
+
+    const filteredUsers = allUsers.filter(user => user.username?.toLowerCase().includes(searchTerm.toLowerCase()));
 
     // Cleans up temporary avatar links and binary file data from RAM
     useEffect(() => {

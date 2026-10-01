@@ -1,11 +1,15 @@
 import { useState } from 'react';
+import { useOutletContext } from 'react-router';
 import { Plus } from 'lucide-react';
-
 import ConversationList from './ConversationList';
 import NewChatModal from './NewChatModal';
+import { useUserChats } from '../hooks';
 
-export default function MobileChatsView({ chats, isLoading, allUsers, onTriggerCreateGroup }) {
-    const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);   
+export default function MobileChatsView() {
+    const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
+
+    const { data: chats, isLoading: isChatsLoading } = useUserChats();
+    const { onTriggerCreateGroup } = useOutletContext();   
 
     const handleStartGroupCreation = () => {
         setIsNewChatModalOpen(false);
@@ -31,14 +35,12 @@ export default function MobileChatsView({ chats, isLoading, allUsers, onTriggerC
             </header>
 
             <div className="flex-1 flex flex-col overflow-hidden">
-                {!isLoading && <ConversationList chats={chats} />}
+                {!isChatsLoading && <ConversationList chats={chats} />}
             </div>
 
             <NewChatModal 
                 isOpen={isNewChatModalOpen}
                 onClose={() => setIsNewChatModalOpen(false)}
-                allUsers={allUsers}
-                isUsersLoading={false}
                 onTriggerCreateGroupFlow={handleStartGroupCreation}
             />
         </div>

@@ -1,16 +1,34 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { X, Search, Users, User } from 'lucide-react';
 import { formatLastConversationDate } from '../../../utils/date';
+import { useAllUsers } from '../../user/hooks';
+import { useGetOrCreateDirectChatMutation } from '../hooks';
 
-export default function NewChatModal({ isOpen, onClose, allUsers = [], onTriggerCreateGroupFlow }) {
+export default function NewChatModal({ isOpen, onClose, onTriggerCreateGroupFlow }) {
     const [searchTerm, setSearchTerm] = useState('');
+    const navigate = useNavigate();
+
+    const { data: allUsers = [] } = useAllUsers();
+    const { mutate: getOrCreateDirectChat, isPending: isGettingOrCreatingChat } = useGetOrCreateDirectChatMutation();
 
     const filteredUsers = allUsers.filter(user => user.username?.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    const handleOpenDirectChat = (userId) => {
-        console.log('user ID:', userId);
-        setSearchTerm('');
-        onClose();
+    const handleOpenDirectChat = (targetUserId) => {
+        if (isGettingOrCreatingChat) {
+            return;
+        }
+
+        getOrCreateDirectChat(targetUserId, {
+            onSuccess: (chat) => {
+                setSearchTerm('');
+                onClose();                
+                
+                if (chat?.id) {
+                    navigate(`/chat/${chat.id}`); 
+                }
+            },
+        });
     };
 
     return (        
@@ -78,6 +96,7 @@ export default function NewChatModal({ isOpen, onClose, allUsers = [], onTrigger
                                 <button
                                     key={user.id}
                                     onClick={() => handleOpenDirectChat(user.id)}
+                                    disabled={isGettingOrCreatingChat}
                                     className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-left cursor-pointer border-b border-gray-50"
                                 >
                                     <div className="shrink-0">

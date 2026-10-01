@@ -6,7 +6,7 @@ import { useOutletContext } from 'react-router';
 export default function MobileSettingsView() {
     const { user } = useCurrentUser();
     const { mutate: logOut, isPending: isLoggingOut } = useLogoutMutation();
-    const { onTriggerProfileModal } = useOutletContext() || {};
+    const { onTriggerProfile } = useOutletContext() || {};
 
     return (
         <div className="h-full min-h-full flex flex-col pb-24 bg-gray-100 overflow-y-auto">            
@@ -36,7 +36,7 @@ export default function MobileSettingsView() {
 
             <div className="px-4">
                 <button
-                    onClick={onTriggerProfileModal} 
+                    onClick={onTriggerProfile} 
                     className="w-full flex items-center gap-4 px-4 py-3.5 rounded-xs bg-white hover:bg-gray-50 cursor-pointer transition-colors"
                 >
                     <User className="w-4 h-4 text-gray-400 shrink-0" />
