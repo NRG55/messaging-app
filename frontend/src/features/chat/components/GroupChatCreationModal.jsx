@@ -1,17 +1,32 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { Search, Check, Camera } from 'lucide-react';
 import { formatLastConversationDate } from '../../../utils/date';
+import { useCreateGroupChatMutation } from '../hooks';
 
-export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [], onCreateGroup }) {
+export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [] }) {
     const [panel, setPanel] = useState('DETAILS'); // panel DETAILS (group name and avatar), panel MEMBERS (group members selection)
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedUserIds, setSelectedUserIds] = useState([]);
-    const [groupName, setGroupName] = useState('');
+    const [chatName, setChatName] = useState('');
     const [avatarFile, setAvatarFile] = useState(null);
     const [previewAvatar, setPreviewAvatar] = useState(null);
     const fileInputRef = useRef(null);
+    const navigate = useNavigate();
 
     const filteredUsers = allUsers.filter(user => user.username?.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    const { mutate: createGroupChat, isPending: isCreatingGroup } = useCreateGroupChatMutation();
+
+    // Cleans up temporary avatar links and binary file data from RAM
+    useEffect(() => {
+        return () => {
+    
+            if (previewAvatar && previewAvatar.startsWith('blob:')) {
+                URL.revokeObjectURL(previewAvatar);
+            }
+        };
+    }, [previewAvatar]);
 
     const handleFileChange = (event) => {
         const file = event.target.files?.[0];
@@ -32,12 +47,28 @@ export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [],
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!groupName.trim() || selectedUserIds.length === 0) {
+
+        if (!chatName.trim() || selectedUserIds.length === 0) {
             return;
         }
+        
+        const formData = new FormData();
+        formData.append('chatName', chatName.trim());
+        formData.append('chatMembersIds', JSON.stringify(selectedUserIds));
+        
+        if (avatarFile) {
+            formData.append('chatAvatar', avatarFile);
+        }
 
-        onCreateGroup(groupName.trim(), selectedUserIds, avatarFile);
-        handleCloseModal();
+        createGroupChat(formData, {
+            onSuccess: (newChat) => {
+                handleCloseModal();
+
+                if (newChat?.id) {
+                    navigate(`/chat/${newChat.id}`);
+                }
+            },
+        });
     };
 
     const handleBackToDetailsPanel = () => {
@@ -52,7 +83,7 @@ export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [],
         setTimeout(() => {
             setSearchTerm('');
             setSelectedUserIds([]);
-            setGroupName('');
+            setChatName('');
             setPanel('DETAILS');
             setPreviewAvatar(null);
             setAvatarFile(null);
@@ -72,8 +103,8 @@ export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [],
             >
                 {/* PANEL 1: Group name and picture */}
                 {panel === 'DETAILS' && (
-                    <div className="flex flex-col h-full bg-white">
-                        <header className="flex items-center px-4 py-3">
+                    <div className="h-full flex flex-col p-3 bg-white">
+                        <header className="flex items-center">
                             <h2 className="text-sm font-semibold text-gray-800 tracking-wide">
                                 New Group
                             </h2>
@@ -108,27 +139,26 @@ export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [],
                             <input
                                 type="text"
                                 placeholder="Enter group name..."
-                                value={groupName}
-                                onChange={(e) => setGroupName(e.target.value)}
+                                value={chatName}
+                                onChange={(e) => setChatName(e.target.value)}
                                 maxLength={50}
                                 className="w-full border-b border-gray-200 py-2 px-1 text-sm text-gray-800 font-medium outline-none placeholder-gray-400 focus:border-gray-500 transition-colors"
                             />
-
                         </div>
                        
-                        <div className="flex justify-end gap-2 p-3">
+                        <div className="flex justify-end gap-2">
                             <button 
                                 type="button"
                                 onClick={handleCloseModal}
                                 className="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-xs cursor-pointer transition-colors"
                             >
-                                Cancel
+                                Close
                             </button>
             
                             <button
                                 type="button"
                                 onClick={() => setPanel('MEMBERS')}
-                                disabled={!groupName.trim()}
+                                disabled={!chatName.trim()}
                                 className="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-xs disabled:opacity-40 disabled:pointer-events-none cursor-pointer transition-all"
                             >
                                 Next
@@ -139,8 +169,8 @@ export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [],
 
                 {/* PANEL 2: Members selection */}
                 {panel === 'MEMBERS' && (
-                    <div className="flex flex-col h-150 bg-white">
-                        <header className="px-4 py-3">
+                    <div className="h-150 flex flex-col p-3 bg-white">
+                        <header className="mb-3">
                             <h2 className="inline-block text-sm font-semibold text-gray-800">
                                 Add members
                             </h2>
@@ -150,7 +180,7 @@ export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [],
                             </span>
                         </header>
 
-                        <div className="px-3 pb-3 border-b border-gray-100">
+                        <div className="mb-6 border-b border-gray-100">
                             <div className="relative">
                                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 
@@ -177,7 +207,7 @@ export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [],
                                         <button
                                             key={user.id}
                                             onClick={() => toggleUserSelection(user.id)}
-                                            className="w-full flex items-center justify-between px-4 py-2.5 text-left border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition-colors"
+                                            className="w-full flex items-center justify-between py-2.5 text-left border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition-colors"
                                         >
                                             <div className="flex items-center gap-3 min-w-0">
                                                 <div className="shrink-0">
@@ -215,7 +245,8 @@ export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [],
                                 })
                             )}
                         </div>
-                        <div className="flex justify-end gap-2 p-3 border-t border-gray-100 shrink-0">
+
+                        <div className="flex justify-end gap-2 pt-3 border-t border-gray-100 shrink-0">
                             <button
                                 type="button"
                                 onClick={handleBackToDetailsPanel}
@@ -227,7 +258,7 @@ export default function GroupChatCreationModal({ isOpen, onClose, allUsers = [],
                             <button
                                 type="button"
                                 onClick={handleSubmit}
-                                disabled={selectedUserIds.length === 0}
+                                disabled={isCreatingGroup || selectedUserIds.length === 0}
                                 className="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 disabled:opacity-40 cursor-pointer transition-opacity"
                             >
                                 Create

@@ -6,21 +6,11 @@ export const getOrCreateDirectChat = (targetUserId) =>
         body: { targetUserId },
     });
 
-export const createGroupChat = ({ chatName, chatMembersIds, avatarFile }) => {
-    const formData = new FormData();
-    
-    formData.append('chatName', chatName);
-    formData.append('chatMembersIds', JSON.stringify(chatMembersIds));
-    
-    if (avatarFile) {
-        formData.append('chatAvatar', avatarFile);
-    }
-
-    return api('/chats/group', {
+export const createGroupChat = (formData) => 
+    api('/chats/group', {
         method: 'POST',
         body: formData,
     });
-};
 
 export const fetchUserChats = () => api('/chats');
 

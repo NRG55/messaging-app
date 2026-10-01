@@ -1,13 +1,11 @@
+import { Navigate } from 'react-router';
+import ProtectedRoute from './components/ProtectedRoute';
+import PublicRoute from './components/PublicRoute';
 import MainLayout from './layouts/MainLayout';
 import AuthLayout from './layouts/AuthLayout';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
-import ProfileModal from './components/views/ProfileModal';
 import ActiveChatView from './features/chat/components/ActiveChatView';
-import PublicChatView from './components/views/PrivateChat';
-import { Navigate } from 'react-router';
-import ProtectedRoute from './components/ProtectedRoute';
-import PublicRoute from './components/PublicRoute';
 import MobileSettingsView from './features/user/components/MobileSettingsView';
 
 const routes = [
@@ -18,10 +16,9 @@ const routes = [
             {
                 element: <MainLayout />,
                 children: [
-                    { index: true, element: <PublicChatView /> },
+                    { index: true, element: <h1>Home view</h1> },
                     { path: 'chat/:chatId', element: <ActiveChatView /> },
                     { path: 'settings', element: <MobileSettingsView /> },
-                    { path: 'user/:username', element: <ProfileModal /> },
                 ],
             },
         ],
