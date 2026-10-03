@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Camera, User } from 'lucide-react';
 import { useCurrentUser, useUpdateProfileMutation } from '../hooks';
 
-export default function ProfileModal({ isOpen, onClose }) {
+export default function MyProfileModal({ isOpen, onClose }) {
     const { user } = useCurrentUser();
     const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfileMutation();
     
