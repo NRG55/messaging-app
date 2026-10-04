@@ -14,7 +14,7 @@ export default function UserProfileModal({ isOpen, onClose, userData }) {
     return (
         <div 
             onClick={onClose}
-            className={`fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs transition-opacity duration-300
+            className={`fixed inset-0 z-60 flex items-center justify-center bg-black/40 backdrop-blur-xs transition-opacity duration-300
                 ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
         >
             <div
@@ -24,8 +24,7 @@ export default function UserProfileModal({ isOpen, onClose, userData }) {
                     ${isOpen ? 'translate-x-0' : 'translate-x-full'}
                     md:static md:w-full md:max-w-md md:h-[65vh] md:rounded-xs md:shadow-xs md:overflow-hidden md:translate-x-0
                     ${isOpen ? 'md:translate-y-0' : 'md:translate-y-40'}`}
-            >                
-                
+            >
                 <div className="flex justify-end">
                     <button
                         type="button"
