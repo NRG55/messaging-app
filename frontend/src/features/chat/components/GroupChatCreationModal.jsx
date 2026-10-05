@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Search, Check, Camera } from 'lucide-react';
-import { formatLastConversationDate } from '../../../utils/date';
+import { Camera } from 'lucide-react';
 import { useCreateGroupChatMutation } from '../hooks';
 import { useAllUsers } from '../../user/hooks';
+import UserSelectionList from '../../user/components/UserSelectionList';
 
 export default function GroupChatCreationModal({ isOpen, onClose }) {
     const [panel, setPanel] = useState('DETAILS'); // panel DETAILS (group name and avatar), panel MEMBERS (group members selection)
-    const [searchTerm, setSearchTerm] = useState('');
     const [selectedUserIds, setSelectedUserIds] = useState([]);
     const [chatName, setChatName] = useState('');
     const [avatarFile, setAvatarFile] = useState(null);
@@ -17,8 +16,6 @@ export default function GroupChatCreationModal({ isOpen, onClose }) {
 
     const { data: allUsers = [] } = useAllUsers();
     const { mutate: createGroupChat, isPending: isCreatingGroup } = useCreateGroupChatMutation();
-
-    const filteredUsers = allUsers.filter(user => user.username?.toLowerCase().includes(searchTerm.toLowerCase()));
 
     // Cleans up temporary avatar links and binary file data from RAM
     useEffect(() => {
@@ -74,7 +71,6 @@ export default function GroupChatCreationModal({ isOpen, onClose }) {
     };
 
     const handleBackToDetailsPanel = () => {
-        setSearchTerm('');
         setSelectedUserIds([]);
         setPanel('DETAILS');
     };
@@ -83,7 +79,6 @@ export default function GroupChatCreationModal({ isOpen, onClose }) {
         onClose();
         // Wait for slide-down animation
         setTimeout(() => {
-            setSearchTerm('');
             setSelectedUserIds([]);
             setChatName('');
             setPanel('DETAILS');
@@ -182,71 +177,11 @@ export default function GroupChatCreationModal({ isOpen, onClose }) {
                             </span>
                         </header>
 
-                        <div className="mb-6 border-b border-gray-100">
-                            <div className="relative">
-                                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-
-                                <input
-                                    type="text"
-                                    placeholder="Search members..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full pl-9 pr-4 py-2 text-sm text-gray-800 placeholder-gray-400 rounded-xs bg-gray-100 outline-none border border-transparent transition-colors focus:bg-white focus:border-gray-200"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="flex-1 overflow-y-auto flex flex-col">
-                            {filteredUsers.length === 0 ? (
-                                <div className="p-8 text-center text-xs text-gray-400 italic">
-                                    No matching users
-                                </div>
-                            ) : (
-                                filteredUsers.map((user) => {
-                                    const isSelected = selectedUserIds.includes(user.id);
-
-                                    return (
-                                        <button
-                                            key={user.id}
-                                            onClick={() => toggleUserSelection(user.id)}
-                                            className="w-full flex items-center justify-between py-2.5 text-left border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition-colors"
-                                        >
-                                            <div className="flex items-center gap-3 min-w-0">
-                                                <div className="shrink-0">
-                                                    {user.avatarUrl ? (
-                                                        <img
-                                                            src={user.avatarUrl}
-                                                            alt={user.username}
-                                                            className="w-10 h-10 rounded-full object-cover border border-gray-100"
-                                                        />
-                                                    ) : (
-                                                        <div className="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 font-semibold text-sm uppercase bg-gray-100">
-                                                            {user.username?.charAt(0) || <User className="w-4 h-4 text-gray-400" />}
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                <div className="min-w-0">
-                                                    <h4 className="text-sm font-medium text-gray-800 truncate capitalize">
-                                                        {user.username}
-                                                    </h4>
-
-                                                    <span className="text-xs text-gray-400">
-                                                        last seen {formatLastConversationDate(user.lastSeen)}
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            <div className={`w-5 h-5 flex items-center justify-center rounded-full border transition-all duration-150 shrink-0
-                                                ${isSelected ? 'bg-green-600 border-green-600 text-white' : 'border-gray-300 bg-white'}`}
-                                            >
-                                                {isSelected && <Check className="w-3 h-3" />}
-                                            </div>
-                                        </button>
-                                    );
-                                })
-                            )}
-                        </div>
+                        <UserSelectionList 
+                            allUsers={allUsers}
+                            selectedUserIds={selectedUserIds}        
+                            onToggleUserSelection={toggleUserSelection}
+                        />
 
                         <div className="flex justify-end gap-2 pt-3 border-t border-gray-100 shrink-0">
                             <button

@@ -1,7 +1,7 @@
 import { X, Users, UserPlus } from 'lucide-react';
 import { useRef } from 'react';
 
-export default function GroupProfileModal({ isOpen, onClose, groupData, onTriggerUserProfile }) {
+export default function GroupChatProfileModal({ isOpen, onClose, groupData, onTriggerUserProfile }) {
     // Ref to keep group info visible during the close slide animation before it becomes null
     const groupDataRef = useRef(null);
 
