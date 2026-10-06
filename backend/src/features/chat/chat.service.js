@@ -56,8 +56,8 @@ export const ChatService = {
         return normalizeChat(chat, currentUserId); 
     },
 
-    async createGroupChat(creatorId, chatName, chatMembersIds, avatarUrl) {
-        const uniqueChatMemberIds = Array.from(new Set([creatorId, ...chatMembersIds]));
+    async createGroupChat(currentUserId, chatName, chatMembersIds, avatarUrl) {
+        const uniqueChatMemberIds = Array.from(new Set([currentUserId, ...chatMembersIds]));
         const members = uniqueChatMemberIds.map((userId) => ({ userId }));
 
         const chat = await prisma.chat.create({
@@ -72,7 +72,7 @@ export const ChatService = {
             include: BASE_CHAT_INCLUDE,
         });
 
-        return normalizeChat(chat, creatorId);
+        return normalizeChat(chat, currentUserId);
     },
 
     async getChatById(chatId, userId) {
@@ -94,11 +94,11 @@ export const ChatService = {
         return normalizeChat(chat, userId);
     },
 
-    async getUserChats(userId) {
+    async getUserChats(currentUserId) {
         const chats = await prisma.chat.findMany({
             where: {
                 members: {
-                    some: { userId },
+                    some: { userId: currentUserId },
                 },
             },
             include: {
@@ -114,7 +114,7 @@ export const ChatService = {
         });
 
         const normalizedChats = chats.map(chat => {
-            const normalizedChat = normalizeChat(chat, userId);
+            const normalizedChat = normalizeChat(chat, currentUserId);
             const rawLatestMessage = chat.messages?.[0] || null;
 
             const latestMessage = rawLatestMessage ? {
@@ -136,6 +136,44 @@ export const ChatService = {
 
         return normalizedChats.sort((a, b) => b.lastActivity.getTime() - a.lastActivity.getTime());
     },
+
+    async addGroupMembers(chatId, currentUserId, newMembersIds) {
+        const chat = await prisma.chat.findUnique({
+            where: { id: chatId, type: 'GROUP' },
+            include: BASE_CHAT_INCLUDE,
+        });
+
+        if (!chat) {
+            throw new Error('CHAT_NOT_FOUND');
+        }
+        
+        const isCurrentUserMember = chat.members.some(member => member.userId === currentUserId);
+        
+        if (!isCurrentUserMember) {
+            throw new Error('CHAT_ACCESS_DENIED');
+        }
+       
+        const existingMemberIds = chat.members.map(member => member.userId);
+        const uniqueNewMembersIds = Array.from(new Set(newMembersIds)).filter(id => !existingMemberIds.includes(id));
+
+        if (uniqueNewMembersIds.length === 0) {
+            return normalizeChat(chat, currentUserId);
+        }
+
+        const newMembers = uniqueNewMembersIds.map(userId => ({ userId }));
+        
+        const updatedChat = await prisma.chat.update({
+            where: { id: chatId },
+            data: {
+                members: {
+                    create: newMembers,
+                },
+            },
+            include: BASE_CHAT_INCLUDE,
+        });
+
+        return normalizeChat(updatedChat, currentUserId);
+    },
 };
 
 function normalizeChat(chat, currentUserId) {
@@ -155,7 +193,7 @@ function normalizeChat(chat, currentUserId) {
         }
     }
 
-    const membersWithOnlineStatus = [];
+    const members = [];
 
     if (chat.members) {
         chat.members.forEach(member => {
@@ -165,12 +203,14 @@ function normalizeChat(chat, currentUserId) {
 
             const isMemberOnline = SessionService.isUserOnline(member.user.id);
 
-            membersWithOnlineStatus.push({
-                ...member,
-                user: {
-                    ...member.user,
-                    isOnline: isMemberOnline,
-                },
+            members.push({
+                id: member.user.id,
+                username: member.user.username,
+                avatarUrl: member.user.avatarUrl,
+                bio: member.user.bio,
+                lastSeen: member.user.lastSeen,
+                joinedAt: member.createdAt,
+                isOnline: isMemberOnline,
             });
         });
     }
@@ -183,6 +223,6 @@ function normalizeChat(chat, currentUserId) {
         createdAt: chat.createdAt,
         isOnline,
         lastSeen,
-        members: membersWithOnlineStatus,
+        members,
     };
 }

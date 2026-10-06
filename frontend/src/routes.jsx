@@ -5,8 +5,10 @@ import MainLayout from './layouts/MainLayout';
 import AuthLayout from './layouts/AuthLayout';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
-import ActiveChatView from './features/chat/components/ActiveChatView';
+import HomeView from './features/chat/components/HomeView';
+import MobileUsersView from './features/user/components/MobileUsersView';
 import MobileSettingsView from './features/user/components/MobileSettingsView';
+import ActiveChatView from './features/chat/components/ActiveChatView';
 
 const routes = [
     {
@@ -16,9 +18,11 @@ const routes = [
             {
                 element: <MainLayout />,
                 children: [
-                    { index: true, element: <h1>Home view</h1> },
-                    { path: 'chat/:chatId', element: <ActiveChatView /> },
+                    { index: true, element: <HomeView /> },
+                    { path: 'users', element: <MobileUsersView /> },
                     { path: 'settings', element: <MobileSettingsView /> },
+                    { path: 'chat/:chatId', element: <ActiveChatView /> },
+                    
                 ],
             },
         ],
