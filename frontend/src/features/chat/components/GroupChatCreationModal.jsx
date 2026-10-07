@@ -47,7 +47,7 @@ export default function GroupChatCreationModal({ isOpen, onClose }) {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (!chatName.trim() || selectedUserIds.length === 0) {
+        if (!chatName.trim()) {
             return;
         }
         
@@ -195,7 +195,7 @@ export default function GroupChatCreationModal({ isOpen, onClose }) {
                             <button
                                 type="button"
                                 onClick={handleSubmit}
-                                disabled={isCreatingGroup || selectedUserIds.length === 0}
+                                disabled={isCreatingGroup}
                                 className="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 disabled:opacity-40 cursor-pointer transition-opacity"
                             >
                                 Create

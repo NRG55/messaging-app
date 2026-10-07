@@ -1,7 +1,10 @@
 import { X, Users, UserPlus } from 'lucide-react';
 import { useRef } from 'react';
+import { useUserChats } from '../hooks';
 
-export default function GroupChatProfileModal({ isOpen, onClose, groupData, onTriggerUserProfile }) {
+export default function GroupChatProfileModal({ isOpen, onClose, chatId, onTriggerUserProfile, onOpenAddMembers }) {
+    const { data: allChats = [] } = useUserChats();
+    const groupData = allChats.find((chat) => chat.id === chatId);
     // Ref to keep group info visible during the close slide animation before it becomes null
     const groupDataRef = useRef(null);
 
@@ -36,7 +39,7 @@ export default function GroupChatProfileModal({ isOpen, onClose, groupData, onTr
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto flex flex-col p-3 gap-3">
+                <div className="flex-1 overflow-y-auto flex flex-col gap-3">
                     <div className="flex flex-col items-center gap-2">
                         <div className="w-20 h-20 flex items-center justify-center rounded-full overflow-hidden">
                             {group.avatarUrl ? (
@@ -61,9 +64,10 @@ export default function GroupChatProfileModal({ isOpen, onClose, groupData, onTr
                         </p>
                     </div>
 
-                    <div className="max-h-60 flex flex-col overflow-y-auto divide-y divide-gray-100">
+                    <div className="flex flex-col">
                         <button 
                             type="button"
+                            onClick={onOpenAddMembers}
                             className="w-full flex items-center gap-3 py-1.5 px-2 text-left hover:bg-gray-50 cursor-pointer transition-colors"
                         >
                             <div className="w-7 h-7 flex items-center justify-center rounded-full">
@@ -75,13 +79,15 @@ export default function GroupChatProfileModal({ isOpen, onClose, groupData, onTr
                             </span>
                         </button>
 
-                        {group.members?.map((member) => (
-                            <GroupMemberButton
-                                key={member.id}
-                                member={member}
-                                onClick={() => onTriggerUserProfile(member)}
-                            />
-                        ))}
+                        <div className="max-h-60 overflow-y-auto">
+                            {group.members?.map((member) => (
+                                <GroupMemberButton
+                                    key={member.id}
+                                    member={member}
+                                    onClick={() => onTriggerUserProfile(member)}
+                                />
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -93,7 +99,7 @@ function GroupMemberButton({ member, onClick }) {
     return (
         <button
             onClick={onClick}
-            className="w-full flex items-center gap-3 py-1.5 px-2 text-left hover:bg-gray-50 cursor-pointer transition-colors"
+            className="w-full flex items-center gap-3 py-1.5 px-2 text-left border-t border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
         >
             <div className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-200 overflow-hidden">
                 {member.avatarUrl ? (
