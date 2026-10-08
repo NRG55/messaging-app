@@ -21,3 +21,9 @@ export const sendChatMessage = ({ chatId, text }) =>
         method: 'POST',
         body: { text },
     });
+
+export const addGroupMembers = ({ chatId, newMembersIds }) =>
+    api(`/chats/group/${chatId}/members`, {
+        method: 'POST',
+        body: { newMembersIds },
+    });
