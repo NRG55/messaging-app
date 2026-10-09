@@ -62,20 +62,10 @@ export default function ActiveChatView() {
         return  <div> Failed to display chat </div>;
     }
 
-    const isGroup = chat.type === 'GROUP';   
-    const memberCount = chat.members?.length || 0;
-
-    const chatTitle = chat.name;
-    const chatSubtitle = isGroup
-        ? `${memberCount} ${memberCount === 1 ? 'member' : 'members'}`
-        : 'Last activity placeholder...';
-
     return (
         <div className="relative flex-1 flex flex-col h-full bg-gray-50 overflow-hidden">
-            <ActiveChatHeader 
-                chatTitle={chatTitle}
-                chatSubtitle={chatSubtitle}
-                chatAvatarUrl={chat?.avatarUrl}
+            <ActiveChatHeader
+                chatData={chat}
                 onBackClick={() => navigate('/')}
             />
 
