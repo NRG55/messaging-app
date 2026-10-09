@@ -85,7 +85,7 @@ export default function ActiveChatHeader({ chatData, onBackClick }) {
     };
 
     return (
-        <header className="absolute top-0 left-0 w-full h-14 flex items-center shrink-0 px-4 bg-transparent pointer-events-none md:static md:bg-white md:border-b md:border-gray-200 md:pointer-events-auto z-20">
+        <header className="absolute top-0 left-0 w-full h-14 flex items-center shrink-0 px-4 bg-transparent pointer-events-none md:static md:bg-white md:border-b md:border-gray-200 md:pointer-events-auto z-10">
             <MobileBackArrow onBackClick={onBackClick} />
             
             <ChatNameDisplay
