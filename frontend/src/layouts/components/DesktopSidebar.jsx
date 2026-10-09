@@ -1,17 +1,21 @@
+import { useState } from 'react';
 import { Menu } from 'lucide-react';
+import { useUserChats } from '../../features/chat/hooks';
 import ConversationList from '../../features/chat/components/ConversationList';
 import MenuDrawer from './DesktopSidebarMenuDrawer';
-import { useState } from 'react';
 
-export default function DesktopSidebar({ chats, isLoading, onTriggerCreateGroup }) {
-    const [isMenuOpen, setIsMenuOpen] = useState(false); 
+export default function DesktopSidebar({ onTriggerCreateGroup, onTriggerProfile }) {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    
+    const { data: chats, isLoading: isChatsLoading } = useUserChats();
 
     return (
         <div className="flex h-full flex-col">
             <MenuDrawer 
                 isOpen={isMenuOpen} 
                 onClose={() => setIsMenuOpen(false)}
-                onTriggerCreateGroup={onTriggerCreateGroup} 
+                onTriggerCreateGroup={onTriggerCreateGroup}
+                onTriggerProfile={onTriggerProfile} 
             />
 
             <div className="p-3 flex items-center gap-2">                
@@ -34,7 +38,7 @@ export default function DesktopSidebar({ chats, isLoading, onTriggerCreateGroup 
             </div>
             
             <div className="flex-1 flex flex-col overflow-hidden">
-                {!isLoading && <ConversationList chats={chats} />}
+                {!isChatsLoading && <ConversationList chats={chats} />}
             </div>
         </div>
     );

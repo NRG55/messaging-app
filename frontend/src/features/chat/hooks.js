@@ -1,5 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createGroupChat, fetchChatMessages, fetchUserChats, getOrCreateDirectChat, sendChatMessage } from './api';
+import {
+    getOrCreateDirectChat,
+    createGroupChat,
+    fetchUserChats,
+    sendChatMessage,
+    fetchChatMessages,
+    addGroupMembers } from './api';
 
 export function useUserChats() {
     return useQuery({
@@ -52,6 +58,17 @@ export function useSendMessageMutation(chatId) {
         mutationFn: sendChatMessage,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['chats', 'messages', chatId] });
+        },
+    });
+}
+
+export function useAddGroupMembersMutation() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: addGroupMembers,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['chats', 'list'] });
         },
     });
 }

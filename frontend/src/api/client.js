@@ -13,15 +13,21 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export const api = async (endpoint, options = {}) => {
     const headers = { ...options.headers };
+    let body = options.body;
     const isFormData = options.body instanceof FormData;
 
     if (!isFormData) {
         headers['Content-Type'] = 'application/json';
+
+        if (body && typeof body === 'object') {
+            body = JSON.stringify(body);
+        }
     }
 
     const config = {
         ...options,
         headers,
+        body,
         credentials: 'include',
     };
 

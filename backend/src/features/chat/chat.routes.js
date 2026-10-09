@@ -12,6 +12,7 @@ router.get('/', verifyToken, ChatController.getUserChats);
 
 router.post('/direct', verifyToken, ChatValidator.getOrCreateDirectChat, ChatController.getOrCreateDirectChat);
 router.post('/group', verifyToken, upload.single('chatAvatar'), ChatValidator.createGroupChat, ChatController.createGroupChat);
+router.post('/group/:chatId/members', verifyToken, ChatValidator.addGroupMembers, ChatController.addGroupMembers);
 
 router.get('/:chatId', verifyToken, ChatController.getChat);
 

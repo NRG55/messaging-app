@@ -30,11 +30,18 @@ export const ChatValidator = {
                     return JSON.parse(value);
 
                 } catch {
-                    return null;
+                    return [];
                 }
             })
-            .isArray({ min: 1 }).withMessage('At least one participant ID must be provided.'),
+            .isArray().withMessage('Group members IDs must be provided in a valid array structure.'),
             
+        handleValidationErrors,
+    ],
+
+    addGroupMembers: [
+        body('newMembersIds')
+            .isArray({ min: 1 })
+            .withMessage('Group members IDs array is required and cannot be empty.'),
         handleValidationErrors,
     ],
 };

@@ -46,8 +46,17 @@ export default function ConversationItem({ chat }) {
 
             <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                    <h4 className="truncate text-sm font-semibold text-gray-900 group-[.active]:text-white capitalize">
-                        {chat.name}
+                    <h4 className="flex items-center gap-1.5 min-w-0 text-sm font-semibold text-gray-900 group-[.active]:text-white">                      
+                        {chat.type === 'GROUP' && (
+                            <Users 
+                                className="w-3.5 h-3.5 shrink-0"
+                                strokeWidth={3}
+                            /> 
+                        )}
+        
+                        <span className="truncate capitalize">
+                            {chat.name}
+                        </span>
                     </h4>
 
                     <span className="text-[11px] text-gray-500 group-[.active]:text-white">

@@ -11,7 +11,7 @@ export const AuthController = {
             return res.status(201).json({
                 success: true,
                 message: 'Registration and login successful!',
-                data: { user },
+                data: user,
             });
 
         } catch (error) {
@@ -28,7 +28,7 @@ export const AuthController = {
             return res.status(200).json({
                 success: true,
                 message: 'Login successful',
-                data: { user },
+                data: user,
             });
 
         } catch (error) {
