@@ -23,7 +23,7 @@ export default function ConversationItem({ chat }) {
                 {chat.avatarUrl ? (
                     <img 
                         src={chat.avatarUrl} 
-                        alt={chat.name} 
+                        alt={chat.name}
                         className="h-12 w-12 shrink-0 rounded-full object-cover shadow-sm"
                     />
                 ) : (

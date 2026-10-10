@@ -77,6 +77,7 @@ export default function ActiveChatView() {
                 ) : (
                     messages.map((message) => {
                         const isMe = message.sender.id === user?.id;
+                        const isGroup = chat.type === 'GROUP';
                         const showSenderName = isGroup && !isMe;
                         const messageBubbleClasses = isMe 
                             ? 'self-end bg-gray-200 border rounded-2xl rounded-br-none border-gray-300'
