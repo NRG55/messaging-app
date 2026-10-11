@@ -6,7 +6,7 @@ import { useActiveChatDetails, useChatMessages, useSendMessageMutation } from '.
 import ActiveChatHeader from './ActiveChatHeader';
 
 export default function ActiveChatView() {
-    const { chatId } = useParams();   
+    const { chatId } = useParams();
     const [messageText, setMessageText] = useState('');
     const messagesEndRef = useRef(null);
     const isInitialLoadRef = useRef(false);
@@ -66,7 +66,7 @@ export default function ActiveChatView() {
         <div className="relative flex-1 flex flex-col h-full bg-gray-50 overflow-hidden">
             <ActiveChatHeader
                 chatData={chat}
-                onBackClick={() => navigate('/')}
+                onBackClick={() => navigate(-1)}
             />
 
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
