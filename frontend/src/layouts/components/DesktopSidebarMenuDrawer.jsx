@@ -1,15 +1,15 @@
-import { User, Users, LogOut, X } from 'lucide-react';
+import { User, Users, LogOut, X, CircleUserRound } from 'lucide-react';
 import { useCurrentUser } from '../../features/user/hooks';
 import { useLogoutMutation } from '../../features/auth/hooks';
 
-export default function MenuDrawer({ isOpen, onClose, onTriggerCreateGroup, onTriggerProfile }) {
+export default function MenuDrawer({ isOpen, onClose, onTriggerProfile, onTriggerCreateGroup, onTriggerUsers }) {
     const { user } = useCurrentUser();
     const { mutate: logout, isPending } = useLogoutMutation();
 
-    const handleNewGroupClick = () => {
-        onClose();
-        onTriggerCreateGroup();
-    };
+    const menuItems = [
+        { label: 'New Group', icon: Users, onClick: onTriggerCreateGroup },
+        { label: 'Users', icon: User, onClick: onTriggerUsers },
+    ];
 
     const handleProfileClick = () => {
         onClose();
@@ -39,8 +39,18 @@ export default function MenuDrawer({ isOpen, onClose, onTriggerCreateGroup, onTr
                         <X className="h-4 w-4" />
                     </button>
 
-                    <div className="h-12 w-12 flex items-center justify-center rounded-full bg-gray-300 text-gray-600 font-bold text-lg">
-                        {user?.username?.charAt(0).toUpperCase() || ''}
+                    <div className="h-12 w-12 rounded-full shrink-0 shadow-xs overflow-hidden">
+                        {user.avatarUrl ? (
+                            <img
+                                src={user.avatarUrl}
+                                alt={user.username}
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center rounded-full text-white font-bold uppercase bg-linear-to-tr from-green-700 to-green-800 shadow-xs">
+                                {user.username?.charAt(0) || <User className="w-5 h-5 text-white" />}
+                            </div>
+                        )}
                     </div>
                     
                     <div className="min-w-0">
@@ -57,20 +67,32 @@ export default function MenuDrawer({ isOpen, onClose, onTriggerCreateGroup, onTr
                             disabled={isPending}
                             className="cursor-pointer w-full flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                         >
-                            <User className="h-5 w-5 text-gray-600" />
+                            <CircleUserRound className="h-5 w-5 text-gray-600" />
                             My Profile
                         </button>
                     </div>
 
-                    <div className="py-2">
-                        <button 
-                            onClick={handleNewGroupClick}
-                            disabled={isPending}
-                            className="cursor-pointer w-full flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                        >
-                            <Users className="h-5 w-5 text-gray-600" />
-                            New Group
-                        </button>
+                    <div className="flex flex-col py-2">
+                        {menuItems.map((item) => {
+                            const IconComponent = item.icon;
+                        
+                            return (
+                                <button 
+                                    key={item.label}
+                                    type="button"
+                                    onClick={() => {
+                                        onClose();
+                                        item.onClick();
+                                    }}
+                                    disabled={isPending}
+                                    className="cursor-pointer w-full flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                >
+                                    <IconComponent className="h-5 w-5 text-gray-600" />
+                                    
+                                    {item.label}
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
                 

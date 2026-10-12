@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams, useSearchParams } from 'react-router';
 import { Send } from 'lucide-react';
 import { useCurrentUser } from '../../user/hooks';
 import { useActiveChatDetails, useChatMessages, useSendMessageMutation } from '../hooks';
@@ -11,6 +11,7 @@ export default function ActiveChatView() {
     const messagesEndRef = useRef(null);
     const isInitialLoadRef = useRef(false);
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     
     const { user, isLoading: isAuthLoading } = useCurrentUser();
     const { chat, isLoading: isChatLoading, isError: isChatError } = useActiveChatDetails(chatId);
@@ -66,7 +67,7 @@ export default function ActiveChatView() {
         <div className="relative flex-1 flex flex-col h-full bg-gray-50 overflow-hidden">
             <ActiveChatHeader
                 chatData={chat}
-                onBackClick={() => navigate(-1)}
+                onBackClick={() => navigate(searchParams.get('from') === 'users' ? '/users' : '/')}
             />
 
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
