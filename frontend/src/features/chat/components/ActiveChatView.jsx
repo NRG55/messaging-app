@@ -1,16 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams, useSearchParams } from 'react-router';
 import { Send } from 'lucide-react';
 import { useCurrentUser } from '../../user/hooks';
 import { useActiveChatDetails, useChatMessages, useSendMessageMutation } from '../hooks';
 import ActiveChatHeader from './ActiveChatHeader';
 
 export default function ActiveChatView() {
-    const { chatId } = useParams();   
+    const { chatId } = useParams();
     const [messageText, setMessageText] = useState('');
     const messagesEndRef = useRef(null);
     const isInitialLoadRef = useRef(false);
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     
     const { user, isLoading: isAuthLoading } = useCurrentUser();
     const { chat, isLoading: isChatLoading, isError: isChatError } = useActiveChatDetails(chatId);
@@ -66,7 +67,7 @@ export default function ActiveChatView() {
         <div className="relative flex-1 flex flex-col h-full bg-gray-50 overflow-hidden">
             <ActiveChatHeader
                 chatData={chat}
-                onBackClick={() => navigate('/')}
+                onBackClick={() => navigate(searchParams.get('from') === 'users' ? '/users' : '/')}
             />
 
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
@@ -77,6 +78,7 @@ export default function ActiveChatView() {
                 ) : (
                     messages.map((message) => {
                         const isMe = message.sender.id === user?.id;
+                        const isGroup = chat.type === 'GROUP';
                         const showSenderName = isGroup && !isMe;
                         const messageBubbleClasses = isMe 
                             ? 'self-end bg-gray-200 border rounded-2xl rounded-br-none border-gray-300'

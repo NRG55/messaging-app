@@ -4,7 +4,7 @@ import { User, Users } from 'lucide-react';
 
 export default function ConversationItem({ chat }) {
     const latestMessage = chat.latestMessage?.text ?? 'No messages yet';
-    const senderLabel = chat.latestMessage ? `${chat.latestMessage.senderName}: ` : '';   
+    const senderLabel = chat.latestMessage ? `${chat.latestMessage.senderName}: ` : '';
     const lastConversationDate = chat.lastActivity ? formatLastConversationDate(chat.lastActivity) : '';
     const showOnlineIndicator = chat.type === 'DIRECT' && chat.isOnline;
 
@@ -21,23 +21,23 @@ export default function ConversationItem({ chat }) {
         >
             <div className="relative shrink-0">
                 {chat.avatarUrl ? (
-                    <img 
-                        src={chat.avatarUrl} 
-                        alt={chat.name} 
+                    <img
+                        src={chat.avatarUrl}
+                        alt={chat.name}
                         className="h-12 w-12 shrink-0 rounded-full object-cover shadow-sm"
                     />
                 ) : (
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-linear-to-tr from-green-700 to-green-800 text-white font-bold shadow-sm uppercase">
                         {chat.name?.charAt(0) || (
-                            chat.type === 'GROUP' 
-                                ? <Users className="w-5 h-5 text-green-100" /> 
+                            chat.type === 'GROUP'
+                                ? <Users className="w-5 h-5 text-green-100" />
                                 : <User className="w-5 h-5 text-green-100" />
                         )}
                     </div>
                 )}
 
                 {showOnlineIndicator && (
-                    <span 
+                    <span
                         className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white group-[.active]:border-green-800 shadow-xs"
                         title="Online"
                     />
@@ -45,7 +45,7 @@ export default function ConversationItem({ chat }) {
             </div>
 
             <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mb-0.5">
                     <h4 className="flex items-center gap-1.5 min-w-0 text-sm font-semibold text-gray-900 group-[.active]:text-white">                      
                         {chat.type === 'GROUP' && (
                             <Users 
@@ -59,13 +59,13 @@ export default function ConversationItem({ chat }) {
                         </span>
                     </h4>
 
-                    <span className="text-[11px] text-gray-500 group-[.active]:text-white">
+                    <span className="text-[10px] text-gray-400 group-[.active]:text-white">
                         {lastConversationDate}
                     </span>
                 </div>
         
-                <div className="flex items-center justify-between mt-0.5">
-                    <p className="max-w-[85%] truncate text-xs text-gray-500 group-[.active]:text-white">
+                <div className="flex items-center justify-between">
+                    <p className="max-w-[85%] truncate text-[10px] text-gray-400 group-[.active]:text-white">
                         <span className="text-gray-400 group-[.active]:text-white">
                             {chat.type === 'GROUP' && senderLabel}
                         </span>

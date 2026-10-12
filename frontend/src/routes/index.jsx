@@ -6,7 +6,7 @@ import AuthLayout from '../layouts/AuthLayout';
 import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 import HomeView from '../features/chat/components/HomeView';
-import MobileUsersView from '../features/user/components/MobileUsersView';
+import UsersRoute from './UsersRoute';
 import ActiveChatView from '../features/chat/components/ActiveChatView';
 import SettingsRoute from './SettingsRoute';
 
@@ -19,7 +19,7 @@ const routes = [
                 element: <MainLayout />,
                 children: [
                     { index: true, element: <HomeView /> },
-                    { path: 'users', element: <MobileUsersView /> },
+                    { path: 'users', element: <UsersRoute /> },
                     { path: 'settings', element: <SettingsRoute /> },
                     { path: 'chat/:chatId', element: <ActiveChatView /> },
                     
@@ -43,7 +43,7 @@ const routes = [
     {
         path: '*',
         element: <Navigate to="/" replace />,
-    },    
+    },
 ];
 
 export default routes;
