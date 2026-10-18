@@ -3,22 +3,25 @@ import { Menu } from 'lucide-react';
 import { useUserChats } from '../../features/chat/hooks';
 import ConversationList from '../../features/chat/components/ConversationList';
 import MenuDrawer from './DesktopSidebarMenuDrawer';
+import DesktopUsersModal from '../../features/user/components/DesktopUsersModal';
 
 export default function DesktopSidebar({ onTriggerCreateGroup, onTriggerProfile }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isUsersModalOpen, setIsUsersModalOpen] = useState(false);
     
     const { data: chats, isLoading: isChatsLoading } = useUserChats();
 
     return (
         <div className="flex h-full flex-col">
-            <MenuDrawer 
+            <MenuDrawer
                 isOpen={isMenuOpen} 
                 onClose={() => setIsMenuOpen(false)}
+                onTriggerProfile={onTriggerProfile}
                 onTriggerCreateGroup={onTriggerCreateGroup}
-                onTriggerProfile={onTriggerProfile} 
+                onTriggerUsers={() => setIsUsersModalOpen(true)} 
             />
 
-            <div className="p-3 flex items-center gap-2">                
+            <div className="p-3 flex items-center gap-2">
                 <button
                     type="button"
                     onClick={() => setIsMenuOpen(true)}
@@ -40,6 +43,11 @@ export default function DesktopSidebar({ onTriggerCreateGroup, onTriggerProfile 
             <div className="flex-1 flex flex-col overflow-hidden">
                 {!isChatsLoading && <ConversationList chats={chats} />}
             </div>
+
+            <DesktopUsersModal 
+                isOpen={isUsersModalOpen}
+                onClose={() => setIsUsersModalOpen(false)}
+            />
         </div>
     );
 }
