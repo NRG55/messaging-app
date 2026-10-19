@@ -14,6 +14,11 @@ export const createGroupChat = (formData) =>
 
 export const fetchUserChats = () => api('/chats');
 
+export const markChatAsRead = (chatId) =>
+    api(`/chats/${chatId}/read`, {
+        method: 'PATCH',
+    });
+
 export const fetchChatMessages = (chatId) => api(`/chats/${chatId}/messages`);
 
 export const sendChatMessage = ({ chatId, text }) =>

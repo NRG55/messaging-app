@@ -5,7 +5,8 @@ import {
     fetchUserChats,
     sendChatMessage,
     fetchChatMessages,
-    addGroupMembers } from './api';
+    addGroupMembers, 
+    markChatAsRead } from './api';
 
 export function useUserChats() {
     return useQuery({
@@ -45,6 +46,17 @@ export function useCreateGroupChatMutation() {
 
     return useMutation({
         mutationFn: createGroupChat,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['chats', 'list'] });
+        },
+    });
+}
+
+export function useMarkChatAsReadMutation() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: markChatAsRead,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['chats', 'list'] });
         },
