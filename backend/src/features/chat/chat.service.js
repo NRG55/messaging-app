@@ -137,6 +137,30 @@ export const ChatService = {
         return normalizedChats.sort((a, b) => b.lastActivity.getTime() - a.lastActivity.getTime());
     },
 
+    async updateLastRead(chatId, userId) {
+        const isMember = await prisma.chatMember.findUnique({
+            where: {
+                userId_chatId: { userId, chatId },
+            },
+        });
+
+        if (!isMember) {
+            throw new Error('CHAT_ACCESS_DENIED');
+        }
+
+        return await prisma.chatMember.update({
+            where: {
+                userId_chatId: {
+                    userId,
+                    chatId,
+                },
+            },
+            data: {
+                lastRead: new Date(),
+            },
+        });
+    },
+
     async addGroupMembers(chatId, currentUserId, newMembersIds) {
         const chat = await prisma.chat.findUnique({
             where: { id: chatId, type: 'GROUP' },

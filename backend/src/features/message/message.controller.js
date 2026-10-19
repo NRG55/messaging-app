@@ -25,7 +25,7 @@ export const MessageController = {
             
             return res.status(200).json(messages);
 
-        } catch (error) {           
+        } catch (error) {
             next(error);
         }
     },

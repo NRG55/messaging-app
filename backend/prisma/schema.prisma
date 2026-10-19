@@ -47,6 +47,7 @@ model ChatMember {
     userId       String
     chatId       String
     createdAt    DateTime @default(now())
+    lastRead     DateTime @default(now())
 
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     chat         Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
