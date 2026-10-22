@@ -53,7 +53,7 @@ export const ChatService = {
             }
         }
 
-        return normalizeChat(chat, currentUserId); 
+        return formatChat(chat, currentUserId); 
     },
 
     async createGroupChat(currentUserId, chatName, chatMembersIds, avatarUrl) {
@@ -72,7 +72,7 @@ export const ChatService = {
             include: BASE_CHAT_INCLUDE,
         });
 
-        return normalizeChat(chat, currentUserId);
+        return formatChat(chat, currentUserId);
     },
 
     async getChatById(chatId, userId) {
@@ -91,7 +91,7 @@ export const ChatService = {
             throw new Error('CHAT_ACCESS_DENIED');
         }
 
-        return normalizeChat(chat, userId);
+        return formatChat(chat, userId);
     },
 
     async getUserChats(currentUserId) {
@@ -113,28 +113,9 @@ export const ChatService = {
             },
         });
 
-        const normalizedChats = chats.map(chat => {
-            const normalizedChat = normalizeChat(chat, currentUserId);
-            const rawLatestMessage = chat.messages?.[0] || null;
+        const formattedChats = chats.map(chat => formatChat(chat, currentUserId));
 
-            const latestMessage = rawLatestMessage ? {
-                id: rawLatestMessage.id,
-                text: rawLatestMessage.text,
-                senderName: rawLatestMessage.sender.username,
-                createdAt: rawLatestMessage.createdAt,
-            } : null;
-
-            const lastActivity = rawLatestMessage ? new Date(rawLatestMessage.createdAt) : new Date(chat.createdAt);
-
-            return {
-                ...normalizedChat,
-                latestMessage,
-                lastActivity,
-            };
-
-        });        
-
-        return normalizedChats.sort((a, b) => b.lastActivity.getTime() - a.lastActivity.getTime());
+        return formattedChats.sort((a, b) => b.lastActivity.getTime() - a.lastActivity.getTime());
     },
 
     async updateLastRead(chatId, userId) {
@@ -181,7 +162,7 @@ export const ChatService = {
         const uniqueNewMembersIds = Array.from(new Set(newMembersIds)).filter(id => !existingMemberIds.includes(id));
 
         if (uniqueNewMembersIds.length === 0) {
-            return normalizeChat(chat, currentUserId);
+            return formatChat(chat, currentUserId);
         }
 
         const newMembers = uniqueNewMembersIds.map(userId => ({ userId }));
@@ -196,11 +177,11 @@ export const ChatService = {
             include: BASE_CHAT_INCLUDE,
         });
 
-        return normalizeChat(updatedChat, currentUserId);
+        return formatChat(updatedChat, currentUserId);
     },
 };
 
-function normalizeChat(chat, currentUserId) {
+function formatChat(chat, currentUserId) {
     let chatName = chat.name;
     let avatarUrl = chat.avatarUrl || null;
     let isOnline = false;
@@ -217,28 +198,6 @@ function normalizeChat(chat, currentUserId) {
         }
     }
 
-    const members = [];
-
-    if (chat.members) {
-        chat.members.forEach(member => {
-            if (!member.user) {
-                return;
-            }
-
-            const isMemberOnline = SessionService.isUserOnline(member.user.id);
-
-            members.push({
-                id: member.user.id,
-                username: member.user.username,
-                avatarUrl: member.user.avatarUrl,
-                bio: member.user.bio,
-                lastSeen: member.user.lastSeen,
-                joinedAt: member.createdAt,
-                isOnline: isMemberOnline,
-            });
-        });
-    }
-
     return {
         id: chat.id,
         type: chat.type,
@@ -247,6 +206,36 @@ function normalizeChat(chat, currentUserId) {
         createdAt: chat.createdAt,
         isOnline,
         lastSeen,
-        members,
+        members: formatMembersList(chat.members),
+        latestMessage: formatLatestMessage(chat.messages?.[0]),
+        lastActivity: chat.messages?.[0] ? new Date(chat.messages[0].createdAt) : new Date(chat.createdAt),
+    };
+}
+
+function formatMembersList(membersList = []) {
+    // Safety check in case user data is missing
+    const validMembers = membersList.filter(member => member.user);
+
+    return validMembers.map(member => ({
+        id: member.user.id,
+        username: member.user.username,
+        avatarUrl: member.user.avatarUrl,
+        bio: member.user.bio,
+        lastSeen: member.user.lastSeen,
+        joinedAt: member.createdAt,
+        isOnline: SessionService.isUserOnline(member.user.id),
+    }));
+}
+
+function formatLatestMessage(message = null) {
+    if (message === null || message === undefined) {
+        return null;
+    }
+
+    return {
+        id: message.id,
+        text: message.text,
+        senderName: message.sender.username,
+        createdAt: message.createdAt,
     };
 }
