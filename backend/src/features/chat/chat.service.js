@@ -105,7 +105,6 @@ export const ChatService = {
                 ...BASE_CHAT_INCLUDE,
                 messages: {
                     orderBy: { createdAt: 'desc' },
-                    take: 1,
                     include: {
                         sender: { select: { username: true } },
                     },
@@ -198,6 +197,9 @@ function formatChat(chat, currentUserId) {
         }
     }
 
+    const currentUser = chat.members?.find(member => member.userId === currentUserId);
+    const lastReadDate = currentUser ? currentUser.lastRead : new Date(0);
+
     return {
         id: chat.id,
         type: chat.type,
@@ -208,6 +210,7 @@ function formatChat(chat, currentUserId) {
         lastSeen,
         members: formatMembersList(chat.members),
         latestMessage: formatLatestMessage(chat.messages?.[0]),
+        unreadCount: countUnreadMessages(chat.messages, currentUserId, lastReadDate),
         lastActivity: chat.messages?.[0] ? new Date(chat.messages[0].createdAt) : new Date(chat.createdAt),
     };
 }
@@ -238,4 +241,15 @@ function formatLatestMessage(message = null) {
         senderName: message.sender.username,
         createdAt: message.createdAt,
     };
+}
+
+function countUnreadMessages(messagesArray = [], currentUserId, lastReadDate) {
+    const unreadMessages = messagesArray.filter(message => {
+        const isNotMyMessage = message.senderId !== currentUserId;
+        const isAfterLastReadDate = new Date(message.createdAt) > new Date(lastReadDate);
+
+        return isNotMyMessage && isAfterLastReadDate;
+    });
+    
+    return unreadMessages.length;
 }
