@@ -8,15 +8,18 @@ import { upload } from '../../middleware/upload.js';
 
 const router = Router();
 
-router.get('/', verifyToken, ChatController.getUserChats);
+router.use(verifyToken);
 
-router.post('/direct', verifyToken, ChatValidator.getOrCreateDirectChat, ChatController.getOrCreateDirectChat);
-router.post('/group', verifyToken, upload.single('chatAvatar'), ChatValidator.createGroupChat, ChatController.createGroupChat);
-router.post('/group/:chatId/members', verifyToken, ChatValidator.addGroupMembers, ChatController.addGroupMembers);
+router.get('/', ChatController.getUserChats);
 
-router.get('/:chatId', verifyToken, ChatController.getChat);
+router.post('/direct', ChatValidator.getOrCreateDirectChat, ChatController.getOrCreateDirectChat);
+router.post('/group', upload.single('chatAvatar'), ChatValidator.createGroupChat, ChatController.createGroupChat);
+router.post('/group/:chatId/members', ChatValidator.addGroupMembers, ChatController.addGroupMembers);
 
-router.post('/:chatId/messages', verifyToken, MessageValidator.sendMessage, MessageController.sendMessage);
-router.get('/:chatId/messages', verifyToken, MessageController.getMessages);
+router.get('/:chatId', ChatController.getChat);
+router.patch('/:chatId/read', ChatController.markAsRead);
+
+router.post('/:chatId/messages', MessageValidator.sendMessage, MessageController.sendMessage);
+router.get('/:chatId/messages', MessageController.getMessages);
 
 export default router;

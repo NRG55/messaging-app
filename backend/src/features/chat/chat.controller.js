@@ -69,6 +69,23 @@ export const ChatController = {
         }
     },
 
+    async markAsRead(req, res, next) {
+        try {
+            const { chatId } = req.params;
+            const currentUserId = req.user.id;
+
+            await ChatService.updateLastRead(chatId, currentUserId);
+
+            return res.status(200).json({
+                success: true,
+                message: 'Chat marked as read successfully.',
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    },
+
     async addGroupMembers(req, res, next) {
         try {
             const currentUserId = req.user.id;

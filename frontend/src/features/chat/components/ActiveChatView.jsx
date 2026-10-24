@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
 import { Send } from 'lucide-react';
 import { useCurrentUser } from '../../user/hooks';
-import { useActiveChatDetails, useChatMessages, useSendMessageMutation } from '../hooks';
+import { useActiveChatDetails, useChatMessages, useMarkChatAsReadMutation, useSendMessageMutation } from '../hooks';
 import ActiveChatHeader from './ActiveChatHeader';
 
 export default function ActiveChatView() {
@@ -16,11 +16,16 @@ export default function ActiveChatView() {
     const { user, isLoading: isAuthLoading } = useCurrentUser();
     const { chat, isLoading: isChatLoading, isError: isChatError } = useActiveChatDetails(chatId);
     const { data: messages = [], isLoading: isMessagesLoading, isError: isMessagesError } = useChatMessages(chatId);
-    const { mutate, isPending } = useSendMessageMutation(chatId);
+    const { mutate: sendMessage, isPending } = useSendMessageMutation(chatId);
+    const { mutate: markChatAsRead } = useMarkChatAsReadMutation();
     
     useEffect(() => {
         isInitialLoadRef.current = false;
-    }, [chatId]);
+
+        if (chatId) {
+            markChatAsRead(chatId);
+        }
+    }, [chatId, markChatAsRead]);
     
     useEffect(() => {
         if (messages.length === 0) {
@@ -45,7 +50,7 @@ export default function ActiveChatView() {
             return;
         }
         
-        mutate({
+        sendMessage({
             chatId: chatId,
             text: messageText.trim(),
         }, {

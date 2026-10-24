@@ -53,7 +53,7 @@ export const ChatService = {
             }
         }
 
-        return normalizeChat(chat, currentUserId); 
+        return formatChat(chat, currentUserId); 
     },
 
     async createGroupChat(currentUserId, chatName, chatMembersIds, avatarUrl) {
@@ -72,7 +72,7 @@ export const ChatService = {
             include: BASE_CHAT_INCLUDE,
         });
 
-        return normalizeChat(chat, currentUserId);
+        return formatChat(chat, currentUserId);
     },
 
     async getChatById(chatId, userId) {
@@ -91,7 +91,7 @@ export const ChatService = {
             throw new Error('CHAT_ACCESS_DENIED');
         }
 
-        return normalizeChat(chat, userId);
+        return formatChat(chat, userId);
     },
 
     async getUserChats(currentUserId) {
@@ -105,7 +105,6 @@ export const ChatService = {
                 ...BASE_CHAT_INCLUDE,
                 messages: {
                     orderBy: { createdAt: 'desc' },
-                    take: 1,
                     include: {
                         sender: { select: { username: true } },
                     },
@@ -113,28 +112,33 @@ export const ChatService = {
             },
         });
 
-        const normalizedChats = chats.map(chat => {
-            const normalizedChat = normalizeChat(chat, currentUserId);
-            const rawLatestMessage = chat.messages?.[0] || null;
+        const formattedChats = chats.map(chat => formatChat(chat, currentUserId));
 
-            const latestMessage = rawLatestMessage ? {
-                id: rawLatestMessage.id,
-                text: rawLatestMessage.text,
-                senderName: rawLatestMessage.sender.username,
-                createdAt: rawLatestMessage.createdAt,
-            } : null;
+        return formattedChats.sort((a, b) => b.lastActivity.getTime() - a.lastActivity.getTime());
+    },
 
-            const lastActivity = rawLatestMessage ? new Date(rawLatestMessage.createdAt) : new Date(chat.createdAt);
+    async updateLastRead(chatId, userId) {
+        const isMember = await prisma.chatMember.findUnique({
+            where: {
+                userId_chatId: { userId, chatId },
+            },
+        });
 
-            return {
-                ...normalizedChat,
-                latestMessage,
-                lastActivity,
-            };
+        if (!isMember) {
+            throw new Error('CHAT_ACCESS_DENIED');
+        }
 
-        });        
-
-        return normalizedChats.sort((a, b) => b.lastActivity.getTime() - a.lastActivity.getTime());
+        return await prisma.chatMember.update({
+            where: {
+                userId_chatId: {
+                    userId,
+                    chatId,
+                },
+            },
+            data: {
+                lastRead: new Date(),
+            },
+        });
     },
 
     async addGroupMembers(chatId, currentUserId, newMembersIds) {
@@ -157,7 +161,7 @@ export const ChatService = {
         const uniqueNewMembersIds = Array.from(new Set(newMembersIds)).filter(id => !existingMemberIds.includes(id));
 
         if (uniqueNewMembersIds.length === 0) {
-            return normalizeChat(chat, currentUserId);
+            return formatChat(chat, currentUserId);
         }
 
         const newMembers = uniqueNewMembersIds.map(userId => ({ userId }));
@@ -172,11 +176,11 @@ export const ChatService = {
             include: BASE_CHAT_INCLUDE,
         });
 
-        return normalizeChat(updatedChat, currentUserId);
+        return formatChat(updatedChat, currentUserId);
     },
 };
 
-function normalizeChat(chat, currentUserId) {
+function formatChat(chat, currentUserId) {
     let chatName = chat.name;
     let avatarUrl = chat.avatarUrl || null;
     let isOnline = false;
@@ -193,27 +197,8 @@ function normalizeChat(chat, currentUserId) {
         }
     }
 
-    const members = [];
-
-    if (chat.members) {
-        chat.members.forEach(member => {
-            if (!member.user) {
-                return;
-            }
-
-            const isMemberOnline = SessionService.isUserOnline(member.user.id);
-
-            members.push({
-                id: member.user.id,
-                username: member.user.username,
-                avatarUrl: member.user.avatarUrl,
-                bio: member.user.bio,
-                lastSeen: member.user.lastSeen,
-                joinedAt: member.createdAt,
-                isOnline: isMemberOnline,
-            });
-        });
-    }
+    const currentUser = chat.members?.find(member => member.userId === currentUserId);
+    const lastReadDate = currentUser ? currentUser.lastRead : new Date(0);
 
     return {
         id: chat.id,
@@ -223,6 +208,48 @@ function normalizeChat(chat, currentUserId) {
         createdAt: chat.createdAt,
         isOnline,
         lastSeen,
-        members,
+        members: formatMembersList(chat.members),
+        latestMessage: formatLatestMessage(chat.messages?.[0]),
+        unreadCount: countUnreadMessages(chat.messages, currentUserId, lastReadDate),
+        lastActivity: chat.messages?.[0] ? new Date(chat.messages[0].createdAt) : new Date(chat.createdAt),
     };
+}
+
+function formatMembersList(membersList = []) {
+    // Safety check in case user data is missing
+    const validMembers = membersList.filter(member => member.user);
+
+    return validMembers.map(member => ({
+        id: member.user.id,
+        username: member.user.username,
+        avatarUrl: member.user.avatarUrl,
+        bio: member.user.bio,
+        lastSeen: member.user.lastSeen,
+        joinedAt: member.createdAt,
+        isOnline: SessionService.isUserOnline(member.user.id),
+    }));
+}
+
+function formatLatestMessage(message = null) {
+    if (message === null || message === undefined) {
+        return null;
+    }
+
+    return {
+        id: message.id,
+        text: message.text,
+        senderName: message.sender.username,
+        createdAt: message.createdAt,
+    };
+}
+
+function countUnreadMessages(messagesArray = [], currentUserId, lastReadDate) {
+    const unreadMessages = messagesArray.filter(message => {
+        const isNotMyMessage = message.senderId !== currentUserId;
+        const isAfterLastReadDate = new Date(message.createdAt) > new Date(lastReadDate);
+
+        return isNotMyMessage && isAfterLastReadDate;
+    });
+    
+    return unreadMessages.length;
 }

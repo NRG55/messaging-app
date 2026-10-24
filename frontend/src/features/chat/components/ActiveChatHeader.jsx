@@ -1,6 +1,7 @@
 import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import { useOutletContext } from 'react-router';
+import { formatLastSeenDate } from '../../../utils/date';
 
 // on the left on mobile, hidden on desktop
 function MobileBackArrow({ onBackClick }) {
@@ -71,14 +72,16 @@ export default function ActiveChatHeader({ chatData, onBackClick }) {
         return null;
     }
 
-    const { name, avatarUrl, type, members } = chatData;
+    const { name, avatarUrl, type, members, isOnline, lastSeen } = chatData;
 
     const isGroup = type === 'GROUP';
     const memberCount = members?.length || 0;
 
     const metaText = isGroup
         ? `${memberCount} ${memberCount === 1 ? 'member' : 'members'}`
-        : 'Last activity placeholder...';
+        : isOnline 
+            ? 'online' 
+            : formatLastSeenDate(lastSeen);
 
     const handleOpenProfile = () => {
         isGroup ? onTriggerGroupProfile(chatData) : onTriggerUserProfile(chatData);
