@@ -1,7 +1,7 @@
 import prisma from '../../config/prisma.js';
 
 export const MessageService = {
-    async createMessage(chatId, senderId, text, imageUrl) {
+    async createMessage({ chatId, senderId, text, imageUrl = null }) {
         const membership = await prisma.chatMember.findUnique({
             where: {
                 userId_chatId: { userId: senderId, chatId },
