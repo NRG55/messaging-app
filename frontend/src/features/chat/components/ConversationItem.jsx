@@ -8,9 +8,6 @@ export default function ConversationItem({ chat }) {
     const lastConversationDate = chat.lastActivity ? formatLastConversationDate(chat.lastActivity) : '';
     const showOnlineIndicator = chat.type === 'DIRECT' && chat.isOnline;
 
-    // TODO: add unreadCount logic to the backend
-    chat.unreadCount = 22;
-
     return (
         <NavLink
             to={`/chat/${chat.id}`}
