@@ -32,7 +32,7 @@ export default function ActiveChatMessage({ message, currentUserId, chatType, on
     return (
         <div
             className={`relative flex flex-col w-fit  min-w-0 shrink-0 overflow-hidden
-                ${hasImage ? 'max-w-lg' : 'max-w-[70%]'}
+                ${hasImage ? 'max-w-sm' : 'max-w-[70%]'}
                 ${isMe ? 'self-end' : 'self-start'}
                 ${bubbleStyle}`}
         >

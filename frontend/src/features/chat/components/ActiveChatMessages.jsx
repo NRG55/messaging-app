@@ -34,8 +34,8 @@ export default function ActiveChatMessages({ chatId, currentUserId, chatType }) 
     }
 
     return (
-        <div className="flex-1 min-h-0 overflow-y-auto p-4">
-            <div className="flex flex-col gap-2">
+        <div className="flex-1 min-h-0 overflow-y-auto">
+            <div className="flex flex-col gap-2 p-4">
                 {messages.length === 0 ? (
                     <div className="flex flex-1 items-center justify-center text-xs italic text-gray-400">
                         There are no messages in this chat yet.
