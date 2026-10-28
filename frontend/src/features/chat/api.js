@@ -21,10 +21,10 @@ export const markChatAsRead = (chatId) =>
 
 export const fetchChatMessages = (chatId) => api(`/chats/${chatId}/messages`);
 
-export const sendChatMessage = ({ chatId, text }) =>
-    api(`/chats/${chatId}/messages`, {
+export const sendChatMessage = (formData) =>
+    api(`/chats/${formData.get('chatId')}/messages`, {
         method: 'POST',
-        body: { text },
+        body: formData,
     });
 
 export const addGroupMembers = ({ chatId, newMembersIds }) =>

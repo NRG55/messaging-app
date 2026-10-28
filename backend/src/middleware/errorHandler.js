@@ -2,7 +2,7 @@ export default function errorHandler(err, req, res, _next) {
     let statusCode = err.statusCode || 500;
     let clientMessage = 'Internal server error. Please try again later.';
     let errors = err.errors || null;
-    
+
     switch (err.message) {
         case 'VALIDATION_FAILED':
             statusCode = 400;

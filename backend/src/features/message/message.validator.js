@@ -5,7 +5,19 @@ export const MessageValidator = {
     sendMessage: [
         body('text')
             .trim()
-            .notEmpty().withMessage('Message cannot be empty.'),
+            .isString()
+            .withMessage('Message must be a valid string.'),
+
+        body().custom((value, { req }) => {
+            const hasText = req.body.text && req.body.text.trim().length > 0;
+            const hasImage = req.file !== undefined;
+
+            if (!hasText && !hasImage) {
+                throw new Error('Message cannot be empty. Please provide text or an image attachment.');
+            }
+
+            return true;
+        }),
             
         handleValidationErrors,
     ],
