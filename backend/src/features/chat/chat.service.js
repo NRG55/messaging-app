@@ -65,6 +65,7 @@ export const ChatService = {
                 type: 'GROUP',
                 name: chatName,
                 avatarUrl,
+                createdBy: currentUserId,
                 members: {
                     create: members,
                 },
