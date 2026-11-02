@@ -49,6 +49,16 @@ export default function errorHandler(err, req, res, _next) {
             clientMessage = 'Access denied. You are not a member of this chat.';
             break;
 
+        case 'DIRECT_CHAT_DELETE_DENIED':
+            statusCode = 403; 
+            clientMessage = 'You do not have permission to delete this direct chat.';
+            break;
+
+        case 'GROUP_CHAT_DELETE_DENIED':
+            statusCode = 403; 
+            clientMessage = 'Only the group creator can delete this chat.';
+            break;
+
         default:
             console.error('Unexpected Server Error:', err);
     }

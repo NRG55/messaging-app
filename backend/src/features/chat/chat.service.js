@@ -142,6 +142,35 @@ export const ChatService = {
         });
     },
 
+    async deleteChat(chatId, userId) {
+        const chat = await prisma.chat.findUnique({
+            where: { id: chatId },
+            include: { members: true },
+        });
+
+        if (!chat) {
+            throw new Error('CHAT_NOT_FOUND');
+        }
+
+        if (chat.type === 'DIRECT') {
+            const isParticipant = chat.members.some(member => member.userId === userId);
+
+            if (!isParticipant) {
+                throw new Error('DIRECT_CHAT_DELETE_DENIED');
+            }
+        }
+
+        if (chat.type === 'GROUP') {
+            if (chat.createdBy !== userId) {
+                throw new Error('GROUP_CHAT_DELETE_DENIED');
+            }
+        }
+
+        return await prisma.chat.delete({
+            where: { id: chatId },
+        });
+    },
+
     async addGroupMembers(chatId, currentUserId, newMembersIds) {
         const chat = await prisma.chat.findUnique({
             where: { id: chatId, type: 'GROUP' },
