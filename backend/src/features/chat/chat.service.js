@@ -1,4 +1,5 @@
 import prisma from '../../config/prisma.js';
+import { CloudinaryUtils } from '../../utils/cloudinary.utils.js';
 import { SessionService } from '../session/session.service.js';
 
 const BASE_CHAT_INCLUDE = {
@@ -166,9 +167,20 @@ export const ChatService = {
             }
         }
 
-        return await prisma.chat.delete({
+        const deletedChat = await prisma.chat.delete({
             where: { id: chatId },
         });
+
+        if (chat.avatarUrl) {
+            try {
+                await CloudinaryUtils.deleteImageByUrl(chat.avatarUrl);
+
+            } catch (error) {
+                console.error('Failed to remove avatar from Cloudinary:', error);               
+            }
+        }
+
+        return deletedChat;
     },
 
     async addGroupMembers(chatId, currentUserId, newMembersIds) {
