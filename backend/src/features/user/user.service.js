@@ -60,11 +60,7 @@ export const UserService = {
             }
         }
 
-        if (updateData.avatarUrl && user.avatarUrl) {
-            CloudinaryUtils.deleteImageByUrl(user.avatarUrl);
-        }
-
-        return await prisma.user.update({
+        const updatedUser = await prisma.user.update({
             where: { id: userId },
             data: updateData,
             select: {
@@ -75,6 +71,17 @@ export const UserService = {
                 createdAt: true,
             },
         });
+
+        if (updateData.avatarUrl && user.avatarUrl) {
+            try {
+                await CloudinaryUtils.deleteImageByUrl(user.avatarUrl);
+
+            } catch (error) {
+                console.error('Failed to remove old user avatar from Cloudinary:', error);                
+            }
+        }
+
+        return updatedUser;
     },
 };
 
