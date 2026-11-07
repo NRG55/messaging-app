@@ -19,6 +19,11 @@ export const markChatAsRead = (chatId) =>
         method: 'PATCH',
     });
 
+export const deleteChat = (chatId) =>
+    api(`/chats/${chatId}`, {
+        method: 'DELETE',
+    });
+
 export const fetchChatMessages = (chatId) => api(`/chats/${chatId}/messages`);
 
 export const sendChatMessage = (formData) =>

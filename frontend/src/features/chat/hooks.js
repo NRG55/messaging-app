@@ -6,7 +6,9 @@ import {
     sendChatMessage,
     fetchChatMessages,
     addGroupMembers, 
-    markChatAsRead } from './api';
+    markChatAsRead, 
+    deleteChat } from './api';
+import { useNavigate, useParams } from 'react-router';
 
 export function useUserChats() {
     return useQuery({
@@ -59,6 +61,18 @@ export function useMarkChatAsReadMutation() {
         mutationFn: markChatAsRead,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['chats', 'list'] });
+        },
+    });
+}
+
+export function useDeleteChatMutation() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: deleteChat,
+        onSuccess: (_data, deletedChatId) => {
+            queryClient.invalidateQueries({ queryKey: ['chats', 'list'] });
+            queryClient.removeQueries({ queryKey: ['chats', 'messages', deletedChatId] });
         },
     });
 }
