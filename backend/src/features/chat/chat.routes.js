@@ -18,6 +18,7 @@ router.post('/group/:chatId/members', ChatValidator.addGroupMembers, ChatControl
 
 router.get('/:chatId', ChatController.getChat);
 router.patch('/:chatId/read', ChatController.markAsRead);
+router.post('/:chatId/leave', ChatController.leaveGroupChat); 
 router.delete('/:chatId', ChatController.deleteChat);
 
 router.post('/:chatId/messages', upload.single('messageImage'), MessageValidator.sendMessage, MessageController.sendMessage);

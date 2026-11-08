@@ -143,6 +143,74 @@ export const ChatService = {
         });
     },
 
+    async addGroupMembers(chatId, currentUserId, newMembersIds) {
+        const chat = await prisma.chat.findUnique({
+            where: { id: chatId, type: 'GROUP' },
+            include: BASE_CHAT_INCLUDE,
+        });
+
+        if (!chat) {
+            throw new Error('CHAT_NOT_FOUND');
+        }
+        
+        const isCurrentUserMember = chat.members.some(member => member.userId === currentUserId);
+        
+        if (!isCurrentUserMember) {
+            throw new Error('CHAT_ACCESS_DENIED');
+        }
+       
+        const existingMemberIds = chat.members.map(member => member.userId);
+        const uniqueNewMembersIds = Array.from(new Set(newMembersIds)).filter(id => !existingMemberIds.includes(id));
+
+        if (uniqueNewMembersIds.length === 0) {
+            return formatChat(chat, currentUserId);
+        }
+
+        const newMembers = uniqueNewMembersIds.map(userId => ({ userId }));
+        
+        const updatedChat = await prisma.chat.update({
+            where: { id: chatId },
+            data: {
+                members: {
+                    create: newMembers,
+                },
+            },
+            include: BASE_CHAT_INCLUDE,
+        });
+
+        return formatChat(updatedChat, currentUserId);
+    },
+
+    async leaveGroupChat(chatId, userId) {
+        const chat = await prisma.chat.findUnique({
+            where: { id: chatId, type: 'GROUP' },
+            include: { members: true },
+        });
+
+        if (!chat) {
+            throw new Error('CHAT_NOT_FOUND');
+        }
+        
+        if (chat.createdBy === userId) {
+            throw new Error('GROUP_CHAT_CREATOR_CANNOT_LEAVE');
+        }
+
+        const isMember = chat.members.some(member => member.userId === userId);
+
+        if (!isMember) {
+            throw new Error('CHAT_ACCESS_DENIED');
+        }
+
+        return await prisma.chatMember.delete({
+            where: {
+                userId_chatId: {
+                    userId,
+                    chatId,
+                },
+            },
+        });
+    },
+
     async deleteChat(chatId, userId) {
         const chat = await prisma.chat.findUnique({
             where: { id: chatId },
@@ -182,44 +250,6 @@ export const ChatService = {
 
         return deletedChat;
     },
-
-    async addGroupMembers(chatId, currentUserId, newMembersIds) {
-        const chat = await prisma.chat.findUnique({
-            where: { id: chatId, type: 'GROUP' },
-            include: BASE_CHAT_INCLUDE,
-        });
-
-        if (!chat) {
-            throw new Error('CHAT_NOT_FOUND');
-        }
-        
-        const isCurrentUserMember = chat.members.some(member => member.userId === currentUserId);
-        
-        if (!isCurrentUserMember) {
-            throw new Error('CHAT_ACCESS_DENIED');
-        }
-       
-        const existingMemberIds = chat.members.map(member => member.userId);
-        const uniqueNewMembersIds = Array.from(new Set(newMembersIds)).filter(id => !existingMemberIds.includes(id));
-
-        if (uniqueNewMembersIds.length === 0) {
-            return formatChat(chat, currentUserId);
-        }
-
-        const newMembers = uniqueNewMembersIds.map(userId => ({ userId }));
-        
-        const updatedChat = await prisma.chat.update({
-            where: { id: chatId },
-            data: {
-                members: {
-                    create: newMembers,
-                },
-            },
-            include: BASE_CHAT_INCLUDE,
-        });
-
-        return formatChat(updatedChat, currentUserId);
-    },
 };
 
 function formatChat(chat, currentUserId) {
@@ -247,6 +277,7 @@ function formatChat(chat, currentUserId) {
         type: chat.type,
         name: chatName,
         avatarUrl,
+        createdBy: chat.createdBy || null,
         createdAt: chat.createdAt,
         isOnline,
         lastSeen,

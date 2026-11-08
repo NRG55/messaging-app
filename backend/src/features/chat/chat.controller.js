@@ -86,23 +86,6 @@ export const ChatController = {
         }
     },
 
-    async deleteChat(req, res, next) {
-        try {
-            const { chatId } = req.params;
-            const currentUserId = req.user.id;
-
-            await ChatService.deleteChat(chatId, currentUserId);
-
-            return res.status(200).json({
-                success: true,
-                message: 'Chat deleted successfully',
-            });
-
-        } catch (error) {
-            next(error);
-        }
-    },
-
     async addGroupMembers(req, res, next) {
         try {
             const currentUserId = req.user.id;
@@ -114,6 +97,40 @@ export const ChatController = {
             return res.status(200).json({
                 success: true,
                 data: updatedChat,
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async leaveGroupChat(req, res, next) {
+        try {
+            const { chatId } = req.params;
+            const currentUserId = req.user.id;
+
+            await ChatService.leaveGroupChat(chatId, currentUserId);
+
+            return res.status(200).json({
+                success: true,
+                message: 'Successfully left the group chat.',
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async deleteChat(req, res, next) {
+        try {
+            const { chatId } = req.params;
+            const currentUserId = req.user.id;
+
+            await ChatService.deleteChat(chatId, currentUserId);
+
+            return res.status(200).json({
+                success: true,
+                message: 'Chat deleted successfully',
             });
 
         } catch (error) {

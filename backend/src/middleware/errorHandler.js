@@ -40,7 +40,7 @@ export default function errorHandler(err, req, res, _next) {
             break;
 
         case 'CHAT_NOT_FOUND':
-            statusCode = 404; 
+            statusCode = 404;
             clientMessage = 'The requested chat does not exist.';
             break;
 
@@ -50,13 +50,18 @@ export default function errorHandler(err, req, res, _next) {
             break;
 
         case 'DIRECT_CHAT_DELETE_DENIED':
-            statusCode = 403; 
+            statusCode = 403;
             clientMessage = 'You do not have permission to delete this direct chat.';
             break;
 
         case 'GROUP_CHAT_DELETE_DENIED':
-            statusCode = 403; 
+            statusCode = 403;
             clientMessage = 'Only the group creator can delete this chat.';
+            break;
+
+        case 'GROUP_CHAT_CREATOR_CANNOT_LEAVE':
+            statusCode = 400;
+            clientMessage = 'The group creator cannot leave the group. You must delete it instead.';
             break;
 
         default:
