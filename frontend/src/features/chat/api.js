@@ -19,6 +19,11 @@ export const markChatAsRead = (chatId) =>
         method: 'PATCH',
     });
 
+export const leaveGroupChat = (chatId) =>
+    api(`/chats/${chatId}/leave`, {
+        method: 'POST',
+    });    
+
 export const deleteChat = (chatId) =>
     api(`/chats/${chatId}`, {
         method: 'DELETE',

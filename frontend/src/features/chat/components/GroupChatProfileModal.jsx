@@ -1,18 +1,47 @@
 import { X, Users, UserPlus } from 'lucide-react';
 import { useRef } from 'react';
-import { useUserChats } from '../hooks';
+import { useNavigate } from 'react-router';
+import { useDeleteChatMutation, useLeaveGroupChatMutation, useUserChats } from '../hooks';
+import { useCurrentUser } from '../../user/hooks';
 
 export default function GroupChatProfileModal({ isOpen, onClose, chatId, onTriggerUserProfile, onOpenAddMembers }) {
-    const { data: allChats = [] } = useUserChats();
-    const groupData = allChats.find((chat) => chat.id === chatId);
     // Ref to keep group info visible during the close slide animation before it becomes null
     const groupDataRef = useRef(null);
+    const navigate = useNavigate();
+
+    const { user: currentUser } = useCurrentUser();
+    const currentUserId = currentUser?.id;
+
+    const { data: allChats = [] } = useUserChats();
+    const groupData = allChats.find((chat) => chat.id === chatId);
 
     if (groupData) {
         groupDataRef.current = groupData;
     }
    
     const group = groupData || groupDataRef.current || {};
+    const isCreator = currentUserId && group.createdBy === currentUserId;
+
+    const deleteGroup = useDeleteChatMutation();
+    const leaveGroup = useLeaveGroupChatMutation();
+
+    const handleDeleteGroup = () => {
+        deleteGroup.mutate(chatId, {
+            onSuccess: () => {
+                onClose();
+                navigate('/', { replace: true });
+            },
+        });
+    };
+
+    const handleLeaveGroup = () => {
+        leaveGroup.mutate(chatId, {
+            onSuccess: () => {
+                onClose();
+                navigate('/', { replace: true });
+            },
+        });
+    };
 
     return (
         <div 
@@ -39,9 +68,9 @@ export default function GroupChatProfileModal({ isOpen, onClose, chatId, onTrigg
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto flex flex-col gap-3">
-                    <div className="flex flex-col items-center gap-2">
-                        <div className="w-20 h-20 flex items-center justify-center rounded-full overflow-hidden">
+                <div className="flex-1 flex flex-col overflow-y-auto">
+                    <div className="flex flex-col items-center mb-4">
+                        <div className="w-20 h-20 flex items-center justify-center mb-4 rounded-full overflow-hidden">
                             {group.avatarUrl ? (
                                 <img
                                     src={group.avatarUrl}
@@ -55,7 +84,7 @@ export default function GroupChatProfileModal({ isOpen, onClose, chatId, onTrigg
                             )}
                         </div>
 
-                        <h3 className="text-sm font-semibold text-gray-800 capitalize">
+                        <h3 className="text-xl font-semibold text-gray-800 capitalize">
                             {group.name}
                         </h3>
 
@@ -68,13 +97,13 @@ export default function GroupChatProfileModal({ isOpen, onClose, chatId, onTrigg
                         <button 
                             type="button"
                             onClick={onOpenAddMembers}
-                            className="w-full flex items-center gap-3 py-1.5 px-2 text-left hover:bg-gray-50 cursor-pointer transition-colors"
+                            className="w-full flex items-center gap-3 p-2 text-left hover:bg-gray-50 cursor-pointer transition-colors"
                         >
                             <div className="w-7 h-7 flex items-center justify-center rounded-full">
-                                <UserPlus className="w-4 h-4 text-blue-500" />
+                                <UserPlus className="w-5 h-5 text-blue-500" />
                             </div>
 
-                            <span className="text-xs text-blue-500 font-medium flex-1">
+                            <span className="text-sm text-blue-500 flex-1">
                                 Add Members
                             </span>
                         </button>
@@ -89,6 +118,27 @@ export default function GroupChatProfileModal({ isOpen, onClose, chatId, onTrigg
                             ))}
                         </div>
                     </div>
+
+                    <div className="mt-auto pt-3 border-t border-gray-100">
+                        {isCreator ? (
+                            <button
+                                type="button"
+                                onClick={handleDeleteGroup}
+                                className="w-full p-2 text-sm text-center hover:text-red-600 text-red-400 cursor-pointer rounded-xs transition-colors"
+                            >                               
+                                Delete Group
+                               
+                            </button>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={handleLeaveGroup}
+                                className="w-full p-2 text-sm text-center hover:text-red-600 text-red-400 cursor-pointer rounded-xs transition-colors"
+                            >                              
+                                Leave Group                                
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
@@ -99,7 +149,7 @@ function GroupMemberButton({ member, onClick }) {
     return (
         <button
             onClick={onClick}
-            className="w-full flex items-center gap-3 py-1.5 px-2 text-left border-t border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
+            className="w-full flex items-center gap-3 p-2 text-left border-t border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
         >
             <div className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-200 overflow-hidden">
                 {member.avatarUrl ? (
@@ -119,7 +169,7 @@ function GroupMemberButton({ member, onClick }) {
                 )}
             </div>
             
-            <span className="flex-1 text-xs text-gray-700 capitalize truncate">
+            <span className="flex-1 text-sm text-gray-700 capitalize truncate">
                 {member.username}
             </span>
         </button>
